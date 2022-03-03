@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.io.*;
+
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Repository;
@@ -20,13 +22,37 @@ public class ImageDao implements Dao<Image> {
   public ImageDao() {
     final ClassPathResource imgFile = new ClassPathResource("test.jpg");
     byte[] fileContent;
+    
     try {
-      fileContent = Files.readAllBytes(imgFile.getFile().toPath());
-      Image img = new Image("test.jpg", fileContent);
-      images.put(img.getId(), img);
+      File dir  = new File("j2f/backend/src/main/resources/images");
+	  	File[] liste = dir.listFiles();
+      for (int i = 0; i < liste.length; i++) {
+        String name = liste[i].getName();
+        if(checkIfExtensionSupported(name)){
+          System.out.println("File : " + name + " is add.");
+          fileContent = Files.readAllBytes(imgFile.getFile().toPath());
+          Image img = new Image(name, fileContent);
+          images.put(img.getId(), img);
+        }else{
+          System.out.println("File : " + name + " isn't add.");
+        }
+      }
     } catch (final IOException e) {
+      //System.out.println("Dossier images non présent");
       e.printStackTrace();
     }
+  }
+
+  public Boolean checkIfExtensionSupported (String fileName){
+    String fe = "";
+		int i = fileName.lastIndexOf('.');
+		if (i > 0) {
+		    fe = fileName.substring(i+1);
+		}
+    if (fe.equals("png") || fe.equals("jpg") || fe.equals("jpeg")) {
+      return true;
+    }
+    return false;
   }
 
   @Override
