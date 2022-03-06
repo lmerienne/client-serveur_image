@@ -21,12 +21,13 @@ public class ImageDao implements Dao<Image> {
 
   public ImageDao() {
     try {
+      ClassPathResource imgFile;
       byte[] fileContent;
       File dir  = new File("src/main/resources/images");
 	  	File[] liste = dir.listFiles();
       for (int i = 0; i < liste.length; i++) {
         String name = liste[i].getName();
-        final ClassPathResource imgFile = new ClassPathResource("images/" + name);
+        imgFile = new ClassPathResource("images/" + name);
         if(checkIfExtensionSupported(name)){
           System.out.println("File : " + name + " is add.");
           fileContent = Files.readAllBytes(imgFile.getFile().toPath());
