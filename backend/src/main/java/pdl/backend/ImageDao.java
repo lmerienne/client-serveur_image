@@ -20,14 +20,13 @@ public class ImageDao implements Dao<Image> {
   private final Map<Long, Image> images = new HashMap<>();
 
   public ImageDao() {
-    final ClassPathResource imgFile = new ClassPathResource("test.jpg");
-    byte[] fileContent;
-    
     try {
-      File dir  = new File("j2f/backend/src/main/resources/images");
+      byte[] fileContent;
+      File dir  = new File("src/main/resources/images");
 	  	File[] liste = dir.listFiles();
       for (int i = 0; i < liste.length; i++) {
         String name = liste[i].getName();
+        final ClassPathResource imgFile = new ClassPathResource("images/" + name);
         if(checkIfExtensionSupported(name)){
           System.out.println("File : " + name + " is add.");
           fileContent = Files.readAllBytes(imgFile.getFile().toPath());
