@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 
+import com.fasterxml.jackson.core.sym.Name;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -23,6 +24,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import boofcv.struct.image.Planar;
 
 @RestController
 public class ImageController {
@@ -76,7 +79,7 @@ public class ImageController {
     }
     return new ResponseEntity<>("Image uploaded", HttpStatus.OK);
   }
-
+//requete json:
   @RequestMapping(value = "/images", method = RequestMethod.GET, produces = "application/json")
   @ResponseBody
   public ArrayNode getImageList() {
@@ -86,6 +89,14 @@ public class ImageController {
       ObjectNode objectNode = mapper.createObjectNode();
       objectNode.put("id", image.getId());
       objectNode.put("name", image.getName());
+      Planar<GrayU8> image = ConvertBufferedImage.convertFromPlanar(input, null, true, GrayU8.class);
+      String fe = "";
+		  int i = image.getName().lastIndexOf('.');
+	  	if (i > 0) {
+		      fe = image.getName().substring(i+1);
+	  	}
+      objectNode.put("type",fe);
+      objectNode.put("size",fe);
       nodes.add(objectNode);
     }
     return nodes;
