@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -39,7 +40,31 @@ public class ImageController {
   public ImageController(ImageDao imageDao) {
     this.imageDao = imageDao;
   }
+  @RequestMapping(value = "/images/{id}", params = {"algorithm", "p1","p2"}, method = RequestMethod.GET)
+  public ResponseEntity<?> parametres2(@RequestParam("algorithm") String name,@RequestParam("p1") String p1,@RequestParam("p2") String p2,@PathVariable long id) {
+    System.out.println("id="+id);
+    System.out.println("name="+name);
+    System.out.println("p1="+p1);
+    System.out.println("p2="+p2);
+    return new ResponseEntity<>("Image id=" + name + " not found.", HttpStatus.NOT_FOUND);
+  }
+  @RequestMapping(value = "/images/{id}", params = {"algorithm", "p1"}, method = RequestMethod.GET)
+  public ResponseEntity<?> parametre1(@RequestParam("algorithm") String name,@RequestParam("p1") String p1,@PathVariable long id) {
+    //Optional<Image> image = imageDao.retrieve(id);
+    System.out.println("id="+id);
+    System.out.println("name="+name);
+    System.out.println("p1="+p1);
+    //System.out.println("p2="+p2);
+    return new ResponseEntity<>("Image id=" + name + " not found.", HttpStatus.NOT_FOUND);
+  }
 
+  @RequestMapping(value = "/images/{id}", params = {"algorithm", "p1"}, method = RequestMethod.GET)
+  public ResponseEntity<?> WithoutParametre(@RequestParam("algorithm") String name,@PathVariable long id) {
+    System.out.println("id="+id);
+    System.out.println("name="+name);
+    //System.out.println("p2="+p2);
+    return new ResponseEntity<>("Image id=" + name + " not found.", HttpStatus.NOT_FOUND);
+  }
   @RequestMapping(value = "/images/{id}", method = RequestMethod.GET, produces = MediaType.IMAGE_JPEG_VALUE)
   public ResponseEntity<?> getImage(@PathVariable("id") long id) {
 
@@ -51,7 +76,7 @@ public class ImageController {
     }
     return new ResponseEntity<>("Image id=" + id + " not found.", HttpStatus.NOT_FOUND);
   }
-
+ 
   @RequestMapping(value = "/images/{id}", method = RequestMethod.DELETE)
   public ResponseEntity<?> deleteImage(@PathVariable("id") long id) {
 
@@ -89,7 +114,7 @@ public class ImageController {
       ObjectNode objectNode = mapper.createObjectNode();
       objectNode.put("id", image.getId());
       objectNode.put("name", image.getName());
-      Planar<GrayU8> image = ConvertBufferedImage.convertFromPlanar(input, null, true, GrayU8.class);
+      //Planar<GrayU8> image = ConvertBufferedImage.convertFromPlanar(input, null, true, GrayU8.class);
       String fe = "";
 		  int i = image.getName().lastIndexOf('.');
 	  	if (i > 0) {
