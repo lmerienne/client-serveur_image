@@ -20,6 +20,8 @@ import boofcv.struct.convolve.Kernel2D_S32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.Planar;
 
+
+
 public class Color {
 
 public static void changeLum(Planar<GrayU8> input, int delta) {
