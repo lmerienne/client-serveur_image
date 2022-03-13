@@ -26,7 +26,11 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import boofcv.io.image.ConvertBufferedImage;
+import boofcv.io.image.UtilImageIO;
+import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.Planar;
+import java.awt.image.BufferedImage;
 
 @RestController
 public class ImageController {
@@ -49,22 +53,34 @@ public class ImageController {
     return new ResponseEntity<>("Image id=" + name + " not found.", HttpStatus.NOT_FOUND);
   }
   @RequestMapping(value = "/images/{id}", params = {"algorithm", "p1"}, method = RequestMethod.GET)
-  public ResponseEntity<?> parametre1(@RequestParam("algorithm") String name,@RequestParam("p1") String p1,@PathVariable long id) {
+  public ResponseEntity<?> parametre1(@RequestParam("algorithm") String name,@RequestParam("p1") int p1,@PathVariable long id) {
     //Optional<Image> image = imageDao.retrieve(id);
     System.out.println("id="+id);
     System.out.println("name="+name);
     System.out.println("p1="+p1);
-    //System.out.println("p2="+p2);
+    if (name.equals("changeLum")){
+      System.out.println("named image="+imageDao.retrieve(id).get().getName());
+        BufferedImage input = UtilImageIO.loadImage("src/main/resources/images/convolution.png");//imageDao.retrieve(id).get().getName());
+        //System.out.println("input="+input);
+        Planar<GrayU8> image = ConvertBufferedImage.convertFromPlanar(input, null, true, GrayU8.class);
+        Color.changeLum(image,p1);
+        UtilImageIO.saveImage(image, "src/main/resources/images/test.png");
+        System.out.println("image modifiée");
+        Optional<Image> image2 = imageDao.retrieve(0);
+        InputStream inputStream = new ByteArrayInputStream(image2.get().getData());
+        return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(new InputStreamResource(inputStream));
+    }
     return new ResponseEntity<>("Image id=" + name + " not found.", HttpStatus.NOT_FOUND);
   }
 
-  @RequestMapping(value = "/images/{id}", params = {"algorithm", "p1"}, method = RequestMethod.GET)
+  @RequestMapping(value = "/images/{id}", params = {"algorithm"}, method = RequestMethod.GET)
   public ResponseEntity<?> WithoutParametre(@RequestParam("algorithm") String name,@PathVariable long id) {
     System.out.println("id="+id);
     System.out.println("name="+name);
     //System.out.println("p2="+p2);
     return new ResponseEntity<>("Image id=" + name + " not found.", HttpStatus.NOT_FOUND);
   }
+  
   @RequestMapping(value = "/images/{id}", method = RequestMethod.GET, produces = MediaType.IMAGE_JPEG_VALUE)
   public ResponseEntity<?> getImage(@PathVariable("id") long id) {
 
