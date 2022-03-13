@@ -60,11 +60,11 @@ public class ImageController {
     System.out.println("p1="+p1);
     if (name.equals("changeLum")){
       System.out.println("named image="+imageDao.retrieve(id).get().getName());
-        BufferedImage input = UtilImageIO.loadImage("src/main/resources/images/convolution.png");//imageDao.retrieve(id).get().getName());
+        BufferedImage input = UtilImageIO.loadImage("src/main/resources/images/"+imageDao.retrieve(id).get().getName());//imageDao.retrieve(id).get().getName());
         //System.out.println("input="+input);
         Planar<GrayU8> image = ConvertBufferedImage.convertFromPlanar(input, null, true, GrayU8.class);
         Color.changeLum(image,p1);
-        UtilImageIO.saveImage(image, "src/main/resources/images/test.png");
+        UtilImageIO.saveImage(image, "src/main/resources/images/"+imageDao.retrieve(0).get().getName());
         System.out.println("image modifiée");
         Optional<Image> image2 = imageDao.retrieve(0);
         InputStream inputStream = new ByteArrayInputStream(image2.get().getData());
