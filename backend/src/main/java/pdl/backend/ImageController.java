@@ -53,7 +53,7 @@ public class ImageController {
 
   @RequestMapping(value = "/images/{id}", params = {"algorithm", "p1"}, method = RequestMethod.GET)
   public ResponseEntity<?>withOneParameter(@RequestParam("algorithm") String algo,@RequestParam("p1") int p1,@PathVariable long id) {
-    
+    /*
     if (algo.equals("changeLum")){
       System.out.println("algod image="+imageDao.retrieve(id).get().getName());
         BufferedImage input = UtilImageIO.loadImage("src/main/resources/images/"+imageDao.retrieve(id).get().getName());//imageDao.retrieve(id).get().getName());
@@ -66,7 +66,10 @@ public class ImageController {
         InputStream inputStream = new ByteArrayInputStream(image2.get().getData());
         return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(new InputStreamResource(inputStream));
     }
+    
     return new ResponseEntity<>("Image id=" + algo + " not found.", HttpStatus.NOT_FOUND);
+    */
+    return applyFilter(algo, p1, 0, id);
   }
 
   
@@ -139,6 +142,18 @@ public class ImageController {
     return nodes;
   }
 
-  
-
+  public ResponseEntity<?> applyFilter(String algo,int p1,int p2, long id) {
+    if (algo.equals("changeLum")){
+      System.out.println("algo image = "+imageDao.retrieve(id).get().getName());
+        BufferedImage input = UtilImageIO.loadImage("src/main/resources/images/"+imageDao.retrieve(id).get().getName());//charge L'image qu'on veut modif
+        Planar<GrayU8> image = ConvertBufferedImage.convertFromPlanar(input, null, true, GrayU8.class);                 //convertis en planar
+        Color.changeLum(image,p1);                                                                                      //applique le filtre
+        UtilImageIO.saveImage(image, "src/main/resources/images/"+algo + "_" +imageDao.retrieve(id).get().getName());    // sauvegarde l'image dans le dossier 
+        System.out.println("image modifiée");
+        Optional<Image> image2 = imageDao.retrieve(id);                                                                   // besoin type pour pouvoir afficher 
+        InputStream inputStream = new ByteArrayInputStream(image2.get().getData());
+        return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(new InputStreamResource(inputStream));
+    }
+    return new ResponseEntity<>("Image id=" + algo + " not found.", HttpStatus.NOT_FOUND);
+  }
 }
