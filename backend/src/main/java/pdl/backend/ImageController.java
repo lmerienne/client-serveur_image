@@ -44,41 +44,37 @@ public class ImageController {
   public ImageController(ImageDao imageDao) {
     this.imageDao = imageDao;
   }
-  @RequestMapping(value = "/images/{id}", params = {"algorithm", "p1","p2"}, method = RequestMethod.GET)
-  public ResponseEntity<?> parametres2(@RequestParam("algorithm") String name,@RequestParam("p1") String p1,@RequestParam("p2") String p2,@PathVariable long id) {
-    System.out.println("id="+id);
-    System.out.println("name="+name);
-    System.out.println("p1="+p1);
-    System.out.println("p2="+p2);
-    return new ResponseEntity<>("Image id=" + name + " not found.", HttpStatus.NOT_FOUND);
+  
+  @RequestMapping(value = "/images/{id}", params = {"algorithm"}, method = RequestMethod.GET)
+  public ResponseEntity<?> withoutParameter(@RequestParam("algorithm") String algo,@PathVariable long id) {
+   
+    return new ResponseEntity<>("Image id=" + algo + " not found.", HttpStatus.NOT_FOUND);
   }
+
   @RequestMapping(value = "/images/{id}", params = {"algorithm", "p1"}, method = RequestMethod.GET)
-  public ResponseEntity<?> parametre1(@RequestParam("algorithm") String name,@RequestParam("p1") int p1,@PathVariable long id) {
-    //Optional<Image> image = imageDao.retrieve(id);
-    System.out.println("id="+id);
-    System.out.println("name="+name);
-    System.out.println("p1="+p1);
-    if (name.equals("changeLum")){
-      System.out.println("named image="+imageDao.retrieve(id).get().getName());
+  public ResponseEntity<?>withOneParameter(@RequestParam("algorithm") String algo,@RequestParam("p1") int p1,@PathVariable long id) {
+    
+    if (algo.equals("changeLum")){
+      System.out.println("algod image="+imageDao.retrieve(id).get().getName());
         BufferedImage input = UtilImageIO.loadImage("src/main/resources/images/"+imageDao.retrieve(id).get().getName());//imageDao.retrieve(id).get().getName());
         //System.out.println("input="+input);
         Planar<GrayU8> image = ConvertBufferedImage.convertFromPlanar(input, null, true, GrayU8.class);
         Color.changeLum(image,p1);
-        UtilImageIO.saveImage(image, "src/main/resources/images/"+imageDao.retrieve(0).get().getName());
+        UtilImageIO.saveImage(image, "src/main/resources/images/"+algo+imageDao.retrieve(0).get().getName());
         System.out.println("image modifiée");
         Optional<Image> image2 = imageDao.retrieve(0);
         InputStream inputStream = new ByteArrayInputStream(image2.get().getData());
         return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(new InputStreamResource(inputStream));
     }
-    return new ResponseEntity<>("Image id=" + name + " not found.", HttpStatus.NOT_FOUND);
+    return new ResponseEntity<>("Image id=" + algo + " not found.", HttpStatus.NOT_FOUND);
   }
 
-  @RequestMapping(value = "/images/{id}", params = {"algorithm"}, method = RequestMethod.GET)
-  public ResponseEntity<?> WithoutParametre(@RequestParam("algorithm") String name,@PathVariable long id) {
-    System.out.println("id="+id);
-    System.out.println("name="+name);
-    //System.out.println("p2="+p2);
-    return new ResponseEntity<>("Image id=" + name + " not found.", HttpStatus.NOT_FOUND);
+  
+
+  @RequestMapping(value = "/images/{id}", params = {"algorithm", "p1","p2"}, method = RequestMethod.GET)
+  public ResponseEntity<?> withTwoParameter(@RequestParam("algorithm") String algo,@RequestParam("p1") String p1,@RequestParam("p2") String p2,@PathVariable long id) {
+   
+    return new ResponseEntity<>("Image id=" + algo + " not found.", HttpStatus.NOT_FOUND);
   }
   
   @RequestMapping(value = "/images/{id}", method = RequestMethod.GET, produces = MediaType.IMAGE_JPEG_VALUE)
@@ -142,5 +138,7 @@ public class ImageController {
     }
     return nodes;
   }
+
+  
 
 }
