@@ -19,5 +19,8 @@ export const api = {
   getImageList: (): Promise<ImageType[]> => requests.get('images', {}),
   getImage: (id: number): Promise<Blob> => requests.get(`images/${id}`, { responseType: "blob" }),
   createImage: (form: FormData): Promise<ImageType> => requests.post('images', form),
-  deleteImage: (id: number): Promise<void> => requests.delete(`images/${id}`),
+  deleteImage: (id: number): Promise<void> => requests.delete(`images/${id}`), 
+  //withoutParameter: (algo: string, id: number): Promise<void> => requests.get(`images/${id}?algorithm=${algo}`),
+  withOneParameter: (algo: string, p1: number, id: number): Promise<void> => requests.get(`images/${id}?algorithm=${algo}&p1=${p1}`, {responseType: "blob"}),
+  //withTwoParameter: (algo: string, p1: number, p2: number, id: number): Promise<void> => requests.get()
 };

@@ -25,7 +25,21 @@ const routes: Array<RouteRecordRaw> = [
     name: "upload",
     component: () => import("./components/Upload.vue"),
     props: true
+  },
+  /*{
+    path: "/image/:id?algorithm=:algo&p1=:p1",
+    name: "algo",
+    component: () => import("./components/Image.vue"),
+    props: ({params}) => ({  })
+  }*/
+  {
+    //path: "/images/:id?algorithm=:algo&p1=:p1",
+    path: "/filter",
+    name: "filter",
+    component: () => import("./components/Filter.vue"),
+    props: ({params}) => ({id: Number(params.id), algorithm: String(params.algorithm), p1: Number(params.p1)})
   }
+
 ];
 
 const router = createRouter({
