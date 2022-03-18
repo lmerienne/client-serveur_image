@@ -6,8 +6,9 @@ import { ImageType } from '@/image'
 
 const selectedId = ref(-1);
 const selectedAlgo = ref('');
-const selectedParam = ref(-1);
+const selectedParam = ref<number>();
 const imageList = ref<ImageType[]>([]);
+const selectedParam2 = ref<number>();
 getImageList();
 
 function getImageList() {
@@ -47,7 +48,29 @@ function showImage2() {
 }
 
 function applyFilter() {
-
+  if (!selectedParam.value) return;
+  console.log(selectedParam.value, selectedAlgo.value, selectedId.value);
+  api.withOneParameter(selectedAlgo.value, selectedParam.value, selectedId.value )
+    .then((data: Blob) => {
+    const reader = new window.FileReader();
+    
+    reader.readAsDataURL(data);
+    reader.onload = () => {
+      console.log("ouiii")
+      const galleryElt = document.getElementById("gallery");
+      if (galleryElt !== null) {
+        const imgElt = document.createElement("img");
+        if(galleryElt.hasChildNodes()){
+            galleryElt.replaceChildren(imgElt);
+        }else{
+            galleryElt.appendChild(imgElt);
+        }
+        if (imgElt !== null && reader.result as string) {
+          imgElt.setAttribute("src", (reader.result as string));
+        }
+      }
+    };
+  });
 }
 
 </script>
@@ -65,12 +88,13 @@ function applyFilter() {
   <div>
       <h4>Choose a filter</h4>
       <select v-model="selectedAlgo">
-          <option id="f1">Filter1</option>
+          <option id="f1">changeLum</option>
           <option id="f2">Filter2</option>
           <option id="f3">Filter3</option>
       </select>
       <input v-model="selectedParam">
-      <button @click="applyFilter">Apply</button>         <!--@click="submitFilter"-->
+      <input v-if="true" v-model="selectedParam2">
+      <button @click="applyFilter">Apply</button>
   </div>
 </template>
 

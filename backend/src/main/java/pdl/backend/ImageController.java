@@ -1,10 +1,16 @@
 package pdl.backend;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
+
+import javax.imageio.ImageIO;
 
 import com.fasterxml.jackson.core.sym.Name;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -49,11 +55,20 @@ public class ImageController {
       System.out.println("algo image = "+imageDao.retrieve(id).get().getName());
         BufferedImage input = UtilImageIO.loadImage("src/main/resources/images/"+imageDao.retrieve(id).get().getName());//charge L'image qu'on veut modif
         Planar<GrayU8> image = ConvertBufferedImage.convertFromPlanar(input, null, true, GrayU8.class);                 //convertis en planar
-        Color.changeLum(image,p1);                                                                                      //applique le filtre
-        UtilImageIO.saveImage(image, "src/main/resources/images/"+algo /*+String.valueOf(p1)*/+ "_" +imageDao.retrieve(id).get().getName());    // sauvegarde l'image dans le dossier 
+        Color.changeLum(image,p1);        
+        String sku = "src/main/resources/images/"+algo /*+String.valueOf(p1)*/+ "_" +imageDao.retrieve(id).get().getName();                                                                              //applique le filtre
+        UtilImageIO.saveImage(image, sku);    // sauvegarde l'image dans le dossier 
         System.out.println("image modifiée");
-        Optional<Image> image2 = imageDao.retrieve(id);                                                                   // besoin type pour pouvoir afficher 
-        InputStream inputStream = new ByteArrayInputStream(image2.get().getData());
+        BufferedImage ski =UtilImageIO.loadImageNotNull(sku);
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        try {
+          ImageIO.write(ski, "jpg", bos);
+          Files.delete(Paths.get(sku));
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+        // Optional<Image> image2 = imageDao.retrieve(id);                                                                   // besoin type pour pouvoir afficher 
+        InputStream inputStream = new ByteArrayInputStream(bos.toByteArray());
         return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(new InputStreamResource(inputStream));
     }
     return new ResponseEntity<>("Image id=" + algo + " not found.", HttpStatus.NOT_FOUND);
@@ -64,7 +79,7 @@ public class ImageController {
     return new ResponseEntity<>("Image id=" + algo + " not found.", HttpStatus.NOT_FOUND);
   }
 
-  @RequestMapping(value = "/images/{id}", params = {"algorithm", "p1"}, method = RequestMethod.GET)
+  @RequestMapping(value = "/images/{id}", params = {"algorithm", "p1"}, method = RequestMethod.GET )
   public ResponseEntity<?>withOneParameter(@RequestParam("algorithm") String algo,@RequestParam("p1") int p1,@PathVariable long id) {
     /*
     if (algo.equals("changeLum")){
