@@ -2,11 +2,11 @@ package pdl.backend;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,86 +53,25 @@ public class ImageController {
     this.imageDao = imageDao;
   }
   public ResponseEntity<?> applyFilter(String algo,int p1,int p2, long id) throws IOException {
-    System.out.println("Application de filtre :");
-    String nameImg = imageDao.retrieve(id).get().getName();
-    String chemin = "src/main/resources/images/";
-    String newNameImge = algo + "_" + nameImg;
-    Optional<Image> imageTest = imageDao.retrieve(id);
-    Image input2=imageTest.get();
-    BufferedImage input = UtilImageIO.loadImage(chemin + nameImg); //charge L'image qu'on veut modif
-    System.out.println("type="+ input.getType());
-    Planar<GrayU8> imageInput = ConvertBufferedImage.convertFromPlanar(input, null, true, GrayU8.class);
-    Planar<GrayU8> image = ConvertBufferedImage.convertFromPlanar(input, null, true, GrayU8.class); //convertis en planar pour appliquer filtre
-
     if (algo.equals("changeLum")){
-      System.out.println("algo = " + algo + " sur image = " + nameImg);
-
-      //Applique et sauvegarde le resultat dans une nouvelle image
-      ByteArrayOutputStream os= new ByteArrayOutputStream();
-      
-
-      Color.changeLum(image,p1);
-      BufferedImage test= new BufferedImage(image.getWidth(),image.getHeight(),input.getType());
-      ConvertBufferedImage.convertTo(image,test,true);
-      String fe = "";
-		  int i = nameImg.lastIndexOf('.');
-	  	if (i > 0) {
-		      fe = nameImg.substring(i+1);
-	  	}
-      ImageIO.write(test,fe,os);
-      InputStream inputStream=new ByteArrayInputStream(os.toByteArray());
-      //
-      
-
-      /*
-      //Selectionne l'image a afficher : ici img de base donc pas ouf
-      Optional<Image> image2 = imageDao.retrieve(id);
-      InputStream inputStream = new ByteArrayInputStream(image2.get().getData());
-      ////////////////////////////////////////////////////////
-      */ 
-      /*
-      File file = new File(chemin+nameImg);
-      byte[] fileContent = new byte[(int) file.length()];
-
-      FileInputStream imageInput = new FileInputStream(file);
-      imageInput.read(fileContent);
-
-
-
-
-      Image img = new Image(newNameImge, fileContent);
-      imageDao.create(img);
-      List<Image> test = imageDao.retrieveAll();
-
-      Optional<Image> imageTest2 = imageDao.retrieve(test.size()-1);
-      Optional<Image> imageTest = imageDao.retrieve(id);
-
-      InputStream inputStream = new ByteArrayInputStream(imageTest2.get().getData());
-      
-      byte[] fileContent = (chemin + newNameImge).getBytes();
-      //byte[] filecontent = load 
-      
-      Image img = new Image(newNameImge, fileContent);
-      imageDao.create(img);
-      List<Image> test = imageDao.retrieveAll();
-      test = imageDao.retrieveAll();
-   
-   
-      Optional<Image> imageTest2 = imageDao.retrieve(test.size()-1);
-      Optional<Image> imageTest = imageDao.retrieve(id);
-     
-      System.out.println("\n\nj'essaie d'afficher la nouvelle image qui est :" + imageTest2.get().getName());
-      System.out.println("taille data de base : " + imageTest.get().getData().length);
-      System.out.println("taille data nouvelle : " + imageTest2.get().getData().length);
-      System.out.println("si meme taile cool");
-   
-    
-      //InputStream inputStream = new ByteArrayInputStream(imageTest2.get().getData());
-      */
-      
-      System.out.println("Filtre bien appliqué / nouvelle image crée");
-      return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(new InputStreamResource(inputStream));
-    
+      System.out.println("algo image = "+imageDao.retrieve(id).get().getName());
+        BufferedImage input = UtilImageIO.loadImage("src/main/resources/images/"+imageDao.retrieve(id).get().getName());//charge L'image qu'on veut modif
+        Planar<GrayU8> image = ConvertBufferedImage.convertFromPlanar(input, null, true, GrayU8.class);                 //convertis en planar
+        Color.changeLum(image,p1);        
+        String sku = "src/main/resources/images/"+algo /*+String.valueOf(p1)*/+ "_" +imageDao.retrieve(id).get().getName();                                                                              //applique le filtre
+        UtilImageIO.saveImage(image, sku);    // sauvegarde l'image dans le dossier 
+        System.out.println("image modifiée");
+        BufferedImage ski =UtilImageIO.loadImageNotNull(sku);
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        try {
+          ImageIO.write(ski, "jpg", bos);
+          Files.delete(Paths.get(sku));
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+        // Optional<Image> image2 = imageDao.retrieve(id);                                                                   // besoin type pour pouvoir afficher 
+        InputStream inputStream = new ByteArrayInputStream(bos.toByteArray());
+        return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(new InputStreamResource(inputStream));
     }
     return new ResponseEntity<>("Image id=" + algo + " not found.", HttpStatus.NOT_FOUND);
   }
@@ -144,9 +83,24 @@ public class ImageController {
   }
   
 
-  @RequestMapping(value = "/images/{id}", params = {"algorithm", "p1"}, method = RequestMethod.GET)
-  public ResponseEntity<?> withOneParameter(@RequestParam("algorithm") String algo,@RequestParam("p1") int p1,@PathVariable long id) throws IOException {
-   
+  @RequestMapping(value = "/images/{id}", params = {"algorithm", "p1"}, method = RequestMethod.GET )
+  public ResponseEntity<?>withOneParameter(@RequestParam("algorithm") String algo,@RequestParam("p1") int p1,@PathVariable long id) throws IOException {
+    /*
+    if (algo.equals("changeLum")){
+      System.out.println("algod image="+imageDao.retrieve(id).get().getName());
+        BufferedImage input = UtilImageIO.loadImage("src/main/resources/images/"+imageDao.retrieve(id).get().getName());//imageDao.retrieve(id).get().getName());
+        //System.out.println("input="+input);
+        Planar<GrayU8> image = ConvertBufferedImage.convertFromPlanar(input, null, true, GrayU8.class);
+        Color.changeLum(image,p1);
+        UtilImageIO.saveImage(image, "src/main/resources/images/"+algo+imageDao.retrieve(0).get().getName());
+        System.out.println("image modifiée");
+        Optional<Image> image2 = imageDao.retrieve(0);
+        InputStream inputStream = new ByteArrayInputStream(image2.get().getData());
+        return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(new InputStreamResource(inputStream));
+    }
+    
+    return new ResponseEntity<>("Image id=" + algo + " not found.", HttpStatus.NOT_FOUND);
+    */
     return applyFilter(algo, p1, 0, id);
   }
 
