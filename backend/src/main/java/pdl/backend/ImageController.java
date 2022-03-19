@@ -59,30 +59,33 @@ public class ImageController {
     if (image.isPresent()) {
       InputStream inputStream = new ByteArrayInputStream(image.get().getData());
       input = ImageIO.read(inputStream);
+    }else{
+      return new ResponseEntity<>("Image id=" + id + " not found.", HttpStatus.NOT_FOUND);
     }
     // PBM  :  input null avec image upload
 
     Planar<GrayU8> imageFilter = ConvertBufferedImage.convertFromPlanar(input, null, true, GrayU8.class);
     if(algo.equals("changeLum")){Color.changeLum(imageFilter,p1);}     
-    if(algo.equals("flou")){
+    else if(algo.equals("flou")){
       // changer nom fct dans arbre deroulant (mettre nom anglais)
       int[][] kernel = {{1,2,3,2,1},{2,6,8,6,2},{3,8,10,8,3},{2,6,8,6,2},{1,2,3,2,1}};
       if(p1 == 0) Color.meanFilterSimple(imageFilter, imageFilter, p2); // filtre moyenneur + p2 intensité flou
       if(p1 == 1) Color.convolution(imageFilter, imageFilter,kernel); // filtre gaussien 
     }
-
-
     // pbm image couleur je pense 
-    if(algo.equals("contour")){
+    else if(algo.equals("contour")){
       // Pas bon car faut que ca marche en niveau de gris ???
       Color.convertGrey(imageFilter, imageFilter);
       Color.gradientImageSobel(imageFilter, imageFilter);
     }
-    if(algo.equals("histogramme")){Color.histo(imageFilter, p1);}
+    else if(algo.equals("histogramme")){Color.histo(imageFilter, p1);}
     ////////////////////////////////////////////////////////////
 
-    if(algo.equals("color")){Color.color(imageFilter,imageFilter,p1,p2);}
-    
+    else if(algo.equals("color")){Color.color(imageFilter,imageFilter,p1,p2);}
+    else{
+      // faire cas trop de paramètre pour l'algo + cas mauvais parametre 
+      return new ResponseEntity<>("Algo not found.", HttpStatus.BAD_REQUEST);
+    }
 
     // FIN application filtre
     String sku = "src/main/resources/images/"+ algo + "_" +imageDao.retrieve(id).get().getName();          
@@ -101,6 +104,8 @@ public class ImageController {
       e.printStackTrace();
     }                                                                  
     InputStream inputStream = new ByteArrayInputStream(bos.toByteArray());
+
+    // return HttpStatus.OK pour code 2OO!!
     return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(new InputStreamResource(inputStream));
   }
 
@@ -163,7 +168,7 @@ public class ImageController {
 //requete json:
   @RequestMapping(value = "/images", method = RequestMethod.GET, produces = "application/json")
   @ResponseBody
-  public ArrayNode getImageList() {
+  public ArrayNode getImageList() throws IOException {
     List<Image> images = imageDao.retrieveAll();
     ArrayNode nodes = mapper.createArrayNode();
     for (Image image : images) {
@@ -172,6 +177,7 @@ public class ImageController {
       objectNode.put("name", image.getName());
       String fe = getExtension(image.getName()); 
 
+      
       
       objectNode.put("type",fe);
 
@@ -182,6 +188,7 @@ public class ImageController {
       Planar<GrayU8> i = ConvertBufferedImage.convertFromPlanar(input, null, true, GrayU8.class);
       objectNode.put("size",i.getHeight() + "x" + i.getWidth() + "x" + i.getNumBands());
       */
+      
       objectNode.put("size",fe);//imageDao.retrieve(image.getId()));
       nodes.add(objectNode);
     }

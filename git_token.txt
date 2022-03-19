@@ -1,23 +1,25 @@
-Max: _J2NruQgU2tCLjojdGkD
-besoin 1    ok mais test
-besoin 2    ok
-besoin 3    
-besoin 4    manque size et test
-besoin 5    ok
-besoin 6    ok
-besoin 7    ok
-besoin 8    
+Token : _J2NruQgU2tCLjojdGkD
+cmd : mvn --projects backend spring-boot:run
+
+besoin 1    ok      FAIRE TEST
+besoin 2    cas suppression 
+besoin 3    ok
+besoin 4    info size  + test
+besoin 5    Gestion d'erreurs
+besoin 6    Gestion d'erreurs
+besoin 7    Gestion d'erreurs
+besoin 8    Gestion d'erreurs
 besoin 9    ok
-besoin 10   
-besoin 11
+besoin 10   ok
+besoin 11   à faire
 besoin 12   ok
-besoin 13
-besoin 14
-besoin 15
-besoin 16
-besoin 17
-besoin 18
-besoin 19   ok 
+besoin 13   à faire
+besoin 14   ok
+besoin 15   filtre ne fonctionne pas 
+besoin 16   pas fou 
+besoin 17   ok
+besoin 18   pas fou
+besoin 19   ok      ECRIRE dans readme
 besoin 20   ok
 besoin 21   ok
 
