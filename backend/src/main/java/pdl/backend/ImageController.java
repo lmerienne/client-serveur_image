@@ -63,13 +63,28 @@ public class ImageController {
     // PBM  :  input null avec image upload
 
     Planar<GrayU8> imageFilter = ConvertBufferedImage.convertFromPlanar(input, null, true, GrayU8.class);
-    if (algo.equals("changeLum")){      
-      Color.changeLum(imageFilter,p1);         
-    }else if( algo.equals("convolution")){
+    if(algo.equals("changeLum")){Color.changeLum(imageFilter,p1);}     
+    if(algo.equals("flou")){
+      // changer nom fct dans arbre deroulant (mettre nom anglais)
       int[][] kernel = {{1,2,3,2,1},{2,6,8,6,2},{3,8,10,8,3},{2,6,8,6,2},{1,2,3,2,1}};
-      int[][] kernel1 = {{1,1,1},{1,1,1},{1,1,1}};
-      Color.convolution(imageFilter, imageFilter,kernel);
+      if(p1 == 0) Color.meanFilterSimple(imageFilter, imageFilter, p2); // filtre moyenneur + p2 intensité flou
+      if(p1 == 1) Color.convolution(imageFilter, imageFilter,kernel); // filtre gaussien 
     }
+
+
+    // pbm image couleur je pense 
+    if(algo.equals("contour")){
+      // Pas bon car faut que ca marche en niveau de gris ???
+      Color.convertGrey(imageFilter, imageFilter);
+      Color.gradientImageSobel(imageFilter, imageFilter);
+    }
+    if(algo.equals("histogramme")){Color.histo(imageFilter, p1);}
+    ////////////////////////////////////////////////////////////
+
+    if(algo.equals("color")){Color.color(imageFilter,imageFilter,p1,p2);}
+    
+
+    // FIN application filtre
     String sku = "src/main/resources/images/"+ algo + "_" +imageDao.retrieve(id).get().getName();          
         
     UtilImageIO.saveImage(imageFilter, sku);    

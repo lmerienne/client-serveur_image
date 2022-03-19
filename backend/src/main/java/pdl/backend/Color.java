@@ -31,6 +31,20 @@ public static void changeLum(Planar<GrayU8> input, int delta) {
     }
 }
 
+public static void histo(Planar<GrayU8> input, int delta) {
+    for (int i = 0; i < input.getNumBands(); ++i){
+      GrayLevelProcessing.histo(input.getBand(i));
+    }
+}
+
+public static void color(Planar<GrayU8> input, Planar<GrayU8> output, int rgb,int delta ){
+	for (int i = 0; i < input.getNumBands(); ++i){
+		if(i == rgb){
+			GrayLevelProcessing.changeLum(input.getBand(rgb),delta);
+		}
+	  }
+}
+
 public static void meanFilterSimple(Planar<GrayU8> input, Planar<GrayU8> output, int size) {
     for (int i = 0; i < input.getNumBands(); ++i){
       Convolution.meanFilterSimple(input.getBand(i), output.getBand(i), 3);
@@ -47,6 +61,12 @@ public static void convolution(Planar<GrayU8> input, Planar<GrayU8> output, int[
     for (int i = 0; i < input.getNumBands(); ++i){
       Convolution.convolution(input.getBand(i), output.getBand(i), kernel);
 	}
+}
+
+public static void gradientImageSobel(Planar<GrayU8> input, Planar<GrayU8> output){
+	for (int i = 0; i < input.getNumBands(); ++i){
+		Convolution.gradientImageSobel(input.getBand(i), output.getBand(i));
+	  }
 }
 
 public static void convertGrey (Planar<GrayU8> input, Planar<GrayU8> output){
