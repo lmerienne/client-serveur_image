@@ -155,7 +155,9 @@ public class ImageController {
       ObjectNode objectNode = mapper.createObjectNode();
       objectNode.put("id", image.getId());
       objectNode.put("name", image.getName());
-      String fe = getExtension(image.getName());
+      String fe = getExtension(image.getName()); 
+
+      
       objectNode.put("type",fe);
 
       /* // marche pas si uplaod img 
