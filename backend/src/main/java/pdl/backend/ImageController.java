@@ -55,16 +55,34 @@ public class ImageController {
   public ResponseEntity<?> applyFilter(String algo,int p1,int p2, long id) throws IOException {
     if (algo.equals("changeLum")){
       System.out.println("algo image = "+imageDao.retrieve(id).get().getName());
-        BufferedImage input = UtilImageIO.loadImage("src/main/resources/images/"+imageDao.retrieve(id).get().getName());//charge L'image qu'on veut modif
-        Planar<GrayU8> image = ConvertBufferedImage.convertFromPlanar(input, null, true, GrayU8.class);                 //convertis en planar
-        Color.changeLum(image,p1);        
-        String sku = "src/main/resources/images/"+algo /*+String.valueOf(p1)*/+ "_" +imageDao.retrieve(id).get().getName();                                                                              //applique le filtre
-        UtilImageIO.saveImage(image, sku);    // sauvegarde l'image dans le dossier 
+        //BufferedImage input = UtilImageIO.loadImage("src/main/resources/images/"+imageDao.retrieve(id).get().getName());//charge L'image qu'on veut modif
+        Optional<Image> image = imageDao.retrieve(id);
+        
+        // probleme si creation input dans if 
+        BufferedImage input = null;
+        if (image.isPresent()) {
+          InputStream inputStream = new ByteArrayInputStream(image.get().getData());
+          input = ImageIO.read(inputStream);
+        }
+
+
+
+        Planar<GrayU8> imageTest = ConvertBufferedImage.convertFromPlanar(input, null, true, GrayU8.class);          
+        Color.changeLum(imageTest,p1);        
+        String sku = "src/main/resources/images/"+ algo + "_" +imageDao.retrieve(id).get().getName();          
+        
+        UtilImageIO.saveImage(imageTest, sku);    
         System.out.println("image modifiée");
+
+
+
         BufferedImage ski =UtilImageIO.loadImageNotNull(sku);
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
+
+        String fe = getExtension(sku);
+		  
         try {
-          ImageIO.write(ski, "jpg", bos);
+          ImageIO.write(ski, fe, bos);
           Files.delete(Paths.get(sku));
         } catch (IOException e) {
           e.printStackTrace();
@@ -138,7 +156,7 @@ public class ImageController {
   public ResponseEntity<?> addImage(@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes) {
 
     String contentType = file.getContentType();
-    if (!contentType.equals(MediaType.IMAGE_JPEG.toString())) {
+    if (!contentType.equals(MediaType.IMAGE_JPEG.toString()) && !contentType.equals(MediaType.IMAGE_PNG.toString()) ) {
       return new ResponseEntity<>("Only JPEG file format supported", HttpStatus.UNSUPPORTED_MEDIA_TYPE);
     }
 
@@ -160,16 +178,21 @@ public class ImageController {
       objectNode.put("id", image.getId());
       objectNode.put("name", image.getName());
       //Planar<GrayU8> image = ConvertBufferedImage.convertFromPlanar(input, null, true, GrayU8.class);
-      String fe = "";
-		  int i = image.getName().lastIndexOf('.');
-	  	if (i > 0) {
-		      fe = image.getName().substring(i+1);
-	  	}
+      String fe = getExtension(image.getName());
       objectNode.put("type",fe);
       objectNode.put("size",fe);//imageDao.retrieve(image.getId()));
       nodes.add(objectNode);
     }
     return nodes;
+  }
+
+  public String getExtension(String s){
+    String fe = "";
+		  int i = s.lastIndexOf('.');
+	  	if (i > 0) {
+		      fe = s.substring(i+1);
+	  	}
+    return fe;
   }
 
  
