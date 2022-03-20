@@ -188,8 +188,13 @@ public class ImageController {
       Planar<GrayU8> i = ConvertBufferedImage.convertFromPlanar(input, null, true, GrayU8.class);
       objectNode.put("size",i.getHeight() + "x" + i.getWidth() + "x" + i.getNumBands());
       */
-      
-      objectNode.put("size",fe);//imageDao.retrieve(image.getId()));
+    BufferedImage input = null;
+    InputStream inputStream = new ByteArrayInputStream(image.getData());
+    input = ImageIO.read(inputStream);
+    // PBM  :  input null avec image upload
+
+    Planar<GrayU8> imagePlanar = ConvertBufferedImage.convertFromPlanar(input, null, true, GrayU8.class);
+      objectNode.put("size",imagePlanar.getWidth()+"x"+imagePlanar.getHeight()+"x"+imagePlanar.getNumBands());//imageDao.retrieve(image.getId()));
       nodes.add(objectNode);
     }
     return nodes;
