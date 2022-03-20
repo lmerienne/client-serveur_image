@@ -9,6 +9,8 @@ const selectedAlgo = ref('');
 const selectedParam = ref<number>();
 const imageList = ref<ImageType[]>([]);
 const selectedParam2 = ref<number>();
+var link: HTMLAnchorElement;
+
 getImageList();
 
 function getImageList() {
@@ -25,7 +27,6 @@ function showImage2() {
     api.getImage(id)
   .then((data: Blob) => {
     const reader = new window.FileReader();
-    
     reader.readAsDataURL(data);
     reader.onload = () => {
       const galleryElt = document.getElementById("gallery");
@@ -48,14 +49,20 @@ function showImage2() {
 }
 
 function applyFilter() {
-  if (selectedParam.value){
-  api.withOneParameter(selectedAlgo.value, selectedParam.value, selectedId.value )
+  if (selectedParam2.value && selectedParam.value){
+  api.withTwoParameter(selectedAlgo.value, selectedParam.value, selectedParam2.value, selectedId.value)
     .then((data: Blob) => {
     const reader = new window.FileReader();
-    
+    console.log("2 param")
+    console.log(selectedParam2.value)
+    const url = window.URL.createObjectURL(data);
+    link = document.createElement('a')
+    link.href = url
+    link.download = "file.png"
+    document.body.appendChild(link)
     reader.readAsDataURL(data);
     reader.onload = () => {
-      console.log("ouiii")
+      
       const galleryElt = document.getElementById("gallery");
       if (galleryElt !== null) {
         const imgElt = document.createElement("img");
@@ -71,14 +78,19 @@ function applyFilter() {
     };
   });
   }
-  else if (selectedParam2.value && selectedParam.value){
-    api.withTwoParameter(selectedAlgo.value, selectedParam.value, selectedParam2.value, selectedId.value)
+  else if (selectedParam.value){
+    api.withOneParameter(selectedAlgo.value, selectedParam.value, selectedId.value )
     .then((data: Blob) => {
     const reader = new window.FileReader();
-    
+    console.log("1 params")
+    const url = window.URL.createObjectURL(data);
+    link = document.createElement('a')
+    link.href = url
+    link.download = "file.png"
+    document.body.appendChild(link)
     reader.readAsDataURL(data);
     reader.onload = () => {
-      console.log("ouiii")
+      
       const galleryElt = document.getElementById("gallery");
       if (galleryElt !== null) {
         const imgElt = document.createElement("img");
@@ -98,10 +110,15 @@ function applyFilter() {
     api.withoutParameter(selectedAlgo.value, selectedId.value)
     .then((data: Blob) => {
     const reader = new window.FileReader();
-    
+    console.log("no param")
+    const url = window.URL.createObjectURL(data);
+    link = document.createElement('a')
+    link.href = url
+    link.download = "file.png"
+    document.body.appendChild(link)
     reader.readAsDataURL(data);
     reader.onload = () => {
-      console.log("ouiii")
+      
       const galleryElt = document.getElementById("gallery");
       if (galleryElt !== null) {
         const imgElt = document.createElement("img");
@@ -117,6 +134,11 @@ function applyFilter() {
     };
   });
   }
+}
+
+function downloadImage(){
+  console.log(link)
+  link.click()
 }
 
 </script>
@@ -135,12 +157,16 @@ function applyFilter() {
       <h4>Choose a filter</h4>
       <select v-model="selectedAlgo">
           <option id="f1">changeLum</option>
-          <option id="f2">Filter2</option>
-          <option id="f3">Filter3</option>
+          <option id="f2">flou</option>
+          <option id="f3">color</option>
       </select>
-      <input v-if="selectedAlgo == 'changeLum' || selectedAlgo == 'Filter2'" v-model="selectedParam">
-      <input v-if="selectedAlgo == 'convolution'" v-model="selectedParam2">
+      <input v-if="selectedAlgo == 'changeLum' || selectedAlgo == 'flou' || selectedAlgo == 'color'" v-model="selectedParam">
+      <input v-if="selectedAlgo == 'convolution' || selectedAlgo == 'color'" v-model="selectedParam2">
       <button @click="applyFilter">Apply</button>
+  </div>
+
+  <div>
+    <button @click="downloadImage">Download</button>
   </div>
 </template>
 

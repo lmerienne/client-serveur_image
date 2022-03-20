@@ -26,14 +26,13 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import("./components/Upload.vue"),
     props: true
   },
-  /*{
-    path: "/image/:id?algorithm=:algo&p1=:p1",
-    name: "algo",
-    component: () => import("./components/Image.vue"),
-    props: ({params}) => ({  })
-  }*/
   {
-    //path: "/images/:id?algorithm=:algo&p1=:p1",
+    path: "/imageG/:id",
+    name: "imageG",
+    component: () => import("./components/ImageG.vue"),
+    props: ({ params }) => ({ id: Number(params.id) || 0 })
+  },
+  {
     path: "/filter",
     name: "filter",
     component: () => import("./components/Filter.vue"),
