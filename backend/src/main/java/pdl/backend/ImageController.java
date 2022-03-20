@@ -69,8 +69,8 @@ public class ImageController {
     else if(algo.equals("flou")){
       // changer nom fct dans arbre deroulant (mettre nom anglais)
       int[][] kernel = {{1,2,3,2,1},{2,6,8,6,2},{3,8,10,8,3},{2,6,8,6,2},{1,2,3,2,1}};
-      if(p1 == 0) Color.meanFilterSimple(imageFilter, imageFilter, p2); // filtre moyenneur + p2 intensité flou
-      if(p1 == 1) Color.convolution(imageFilter, imageFilter,kernel); // filtre gaussien 
+      if(p1 == 1) Color.meanFilterSimple(imageFilter, imageFilter, p2); // filtre moyenneur + p2 intensité flou
+      if(p1 == 2) Color.convolution(imageFilter, imageFilter,kernel); // filtre gaussien 
     }
     // pbm image couleur je pense 
     else if(algo.equals("contour")){
@@ -80,8 +80,8 @@ public class ImageController {
     }
     else if(algo.equals("histogramme")){Color.histo(imageFilter, p1);}
     ////////////////////////////////////////////////////////////
-
-    else if(algo.equals("color")){Color.color(imageFilter,imageFilter,p1,p2);}
+   
+    else if(algo.equals("color")){Color.color(imageFilter,imageFilter,p1-1,p2);}
     else{
       // faire cas trop de paramètre pour l'algo + cas mauvais parametre 
       return new ResponseEntity<>("Algo not found.", HttpStatus.BAD_REQUEST);

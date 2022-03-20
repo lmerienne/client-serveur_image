@@ -9,6 +9,8 @@ const selectedAlgo = ref('');
 const selectedParam = ref<number>();
 const imageList = ref<ImageType[]>([]);
 const selectedParam2 = ref<number>();
+const selectedOptionFlou = ref('');
+const selectedOptionColor = ref('');
 var link: HTMLAnchorElement;
 
 getImageList();
@@ -141,6 +143,19 @@ function downloadImage(){
   link.click()
 }
 
+function applyFlou(){
+  if(selectedOptionFlou.value == "Moyenneur"){ selectedParam.value = 1;}
+  else{ selectedParam.value = 2;}
+  applyFilter();
+}
+
+function applyColor(){
+  if(selectedOptionColor.value == "Rouge"){ selectedParam.value = 1;}
+  else if(selectedOptionColor.value == "Vert"){ selectedParam.value = 2;}
+  else{ selectedParam.value = 3;}
+  applyFilter();
+}
+
 </script>
 
 <template>
@@ -159,10 +174,23 @@ function downloadImage(){
           <option id="f1">changeLum</option>
           <option id="f2">flou</option>
           <option id="f3">color</option>
+          <option id="f4">histogramme</option>
+          <option id="f5">contour</option>
       </select>
-      <input v-if="selectedAlgo == 'changeLum' || selectedAlgo == 'flou' || selectedAlgo == 'color'" v-model="selectedParam">
-      <input v-if="selectedAlgo == 'convolution' || selectedAlgo == 'color'" v-model="selectedParam2">
-      <button @click="applyFilter">Apply</button>
+      <select v-if="selectedAlgo == 'flou' " v-model="selectedOptionFlou">
+        <option id="p1"> Moyenneur</option>
+        <option id="p2"> Gaussien </option>
+      </select>
+      <select v-if="selectedAlgo == 'color'" v-model="selectedOptionColor">
+        <option id="c1">Rouge</option>
+        <option id="c2">Vert</option>
+        <option id="c3">Bleu</option>
+      </select>
+      <input v-if="selectedAlgo == 'changeLum' || selectedAlgo == 'histogramme'" v-model="selectedParam">
+      <input v-if="selectedOptionFlou == 'Moyenneur' || selectedAlgo == 'color'" v-model="selectedParam2">
+      <button v-if="selectedAlgo == 'flou'" @click="applyFlou">Apply</button>
+      <button v-if="selectedAlgo == 'color'" @click="applyColor">Apply</button>
+      <button v-if="selectedAlgo != 'flou' && selectedAlgo != 'color'" @click="applyFilter">Apply</button>
   </div>
 
   <div>
@@ -171,4 +199,8 @@ function downloadImage(){
 </template>
 
 <style scoped>
+img{
+    max-width: 50%;
+    max-height: 5%;
+  }
 </style>

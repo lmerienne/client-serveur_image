@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { defineProps, ref } from 'vue';
 import { api } from '@/http-api';
+import router from '@/router';
 
 const props = defineProps<{ id: number }>()
 var link: HTMLAnchorElement;
@@ -39,13 +40,24 @@ function downloadImage(){
   link.click()
 }
 
+function deleteImage(){
+  api.deleteImage(props.id)
+  router.push({name:'home'})
+}
+
 </script>
 
 <template>
   <figure id="gallery"></figure> 
   <div>
     <button @click="downloadImage">Download</button> 
+    <button @click="deleteImage">Delete</button>
   </div>
 </template>
 
-<style></style>
+<style>
+  img{
+    max-width: 50%;
+    max-height: 5%;
+  }
+</style>

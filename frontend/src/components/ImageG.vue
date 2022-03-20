@@ -29,4 +29,10 @@ api.getImage(props.id)
   <figure id="gallery"></figure> 
 </template>
 
-<style></style>
+<style>
+  img{
+    max-width: 20%;
+    max-height: 5%;
+    padding-right: 5px;
+  }
+</style>
