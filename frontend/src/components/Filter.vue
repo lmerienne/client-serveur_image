@@ -48,8 +48,7 @@ function showImage2() {
 }
 
 function applyFilter() {
-  if (!selectedParam.value) return;
-  console.log(selectedParam.value, selectedAlgo.value, selectedId.value);
+  if (selectedParam.value){
   api.withOneParameter(selectedAlgo.value, selectedParam.value, selectedId.value )
     .then((data: Blob) => {
     const reader = new window.FileReader();
@@ -71,6 +70,53 @@ function applyFilter() {
       }
     };
   });
+  }
+  else if (selectedParam2.value && selectedParam.value){
+    api.withTwoParameter(selectedAlgo.value, selectedParam.value, selectedParam2.value, selectedId.value)
+    .then((data: Blob) => {
+    const reader = new window.FileReader();
+    
+    reader.readAsDataURL(data);
+    reader.onload = () => {
+      console.log("ouiii")
+      const galleryElt = document.getElementById("gallery");
+      if (galleryElt !== null) {
+        const imgElt = document.createElement("img");
+        if(galleryElt.hasChildNodes()){
+            galleryElt.replaceChildren(imgElt);
+        }else{
+            galleryElt.appendChild(imgElt);
+        }
+        if (imgElt !== null && reader.result as string) {
+          imgElt.setAttribute("src", (reader.result as string));
+        }
+      }
+    };
+  });
+  }
+  else{
+    api.withoutParameter(selectedAlgo.value, selectedId.value)
+    .then((data: Blob) => {
+    const reader = new window.FileReader();
+    
+    reader.readAsDataURL(data);
+    reader.onload = () => {
+      console.log("ouiii")
+      const galleryElt = document.getElementById("gallery");
+      if (galleryElt !== null) {
+        const imgElt = document.createElement("img");
+        if(galleryElt.hasChildNodes()){
+            galleryElt.replaceChildren(imgElt);
+        }else{
+            galleryElt.appendChild(imgElt);
+        }
+        if (imgElt !== null && reader.result as string) {
+          imgElt.setAttribute("src", (reader.result as string));
+        }
+      }
+    };
+  });
+  }
 }
 
 </script>
@@ -92,8 +138,8 @@ function applyFilter() {
           <option id="f2">Filter2</option>
           <option id="f3">Filter3</option>
       </select>
-      <input v-model="selectedParam">
-      <input v-if="true" v-model="selectedParam2">
+      <input v-if="selectedAlgo == 'changeLum' || selectedAlgo == 'Filter2'" v-model="selectedParam">
+      <input v-if="selectedAlgo == 'convolution'" v-model="selectedParam2">
       <button @click="applyFilter">Apply</button>
   </div>
 </template>

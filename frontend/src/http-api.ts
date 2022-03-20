@@ -20,7 +20,7 @@ export const api = {
   getImage: (id: number): Promise<Blob> => requests.get(`images/${id}`, { responseType: "blob" }),
   createImage: (form: FormData): Promise<ImageType> => requests.post('images', form),
   deleteImage: (id: number): Promise<void> => requests.delete(`images/${id}`), 
-  //withoutParameter: (algo: string, id: number): Promise<void> => requests.get(`images/${id}?algorithm=${algo}`),
+  withoutParameter: (algo: string, id: number): Promise<Blob> => requests.get(`images/${id}?algorithm=${algo}`, {responseType: "blob"}),
   withOneParameter: (algo: string, p1: number, id: number): Promise<Blob> => requests.get(`images/${id}?algorithm=${algo}&p1=${p1}`, {responseType: "blob"}),
-  //withTwoParameter: (algo: string, p1: number, p2: number, id: number): Promise<void> => requests.get()
+  withTwoParameter: (algo: string, p1: number, p2: number, id: number): Promise<Blob> => requests.get(`images/${id}?algorithm=${algo}&p1=${p1}&p2=${p2}`, {responseType: "blob"})
 };
