@@ -31,7 +31,7 @@ public static void changeLum(Planar<GrayU8> input, int delta) {
     }
 }
 
-public static void histo(Planar<GrayU8> input, int delta) {
+public static void histo(Planar<GrayU8> input) {
     for (int i = 0; i < input.getNumBands(); ++i){
       GrayLevelProcessing.histo(input.getBand(i));
     }
@@ -47,13 +47,13 @@ public static void color(Planar<GrayU8> input, Planar<GrayU8> output, int rgb,in
 
 public static void meanFilterSimple(Planar<GrayU8> input, Planar<GrayU8> output, int size) {
     for (int i = 0; i < input.getNumBands(); ++i){
-      Convolution.meanFilterSimple(input.getBand(i), output.getBand(i), 3);
+      Convolution.meanFilterSimple(input.getBand(i), output.getBand(i), size);
     }
 }
 
 public static void meanFilterWithBorders(Planar<GrayU8> input, Planar<GrayU8> output, int size, BorderType borderType) {
     for (int i = 0; i < input.getNumBands(); ++i){
-      Convolution.meanFilterWithBorders(input.getBand(i), output.getBand(i), 3, BorderType.SKIP );
+      Convolution.meanFilterWithBorders(input.getBand(i), output.getBand(i), size, BorderType.SKIP );
     }
 }
 

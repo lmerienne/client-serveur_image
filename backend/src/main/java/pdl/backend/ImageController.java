@@ -65,11 +65,14 @@ public class ImageController {
     // PBM  :  input null avec image upload
 
     Planar<GrayU8> imageFilter = ConvertBufferedImage.convertFromPlanar(input, null, true, GrayU8.class);
-    if(algo.equals("changeLum")){Color.changeLum(imageFilter,p1);}     
+    if(algo.equals("changeLum")){
+      if (p1<-255 ||p1>255) return new ResponseEntity<>("Algo not found.", HttpStatus.BAD_REQUEST); //verification du delta entre -255 et 255
+      Color.changeLum(imageFilter,p1);}     
     else if(algo.equals("flou")){
       // changer nom fct dans arbre deroulant (mettre nom anglais)
       int[][] kernel = {{1,2,3,2,1},{2,6,8,6,2},{3,8,10,8,3},{2,6,8,6,2},{1,2,3,2,1}};
       if(p1 == 1) Color.meanFilterSimple(imageFilter, imageFilter, p2); // filtre moyenneur + p2 intensité flou
+      if (p2<=0) return new ResponseEntity<>("Algo not found.", HttpStatus.BAD_REQUEST); //test si le deuxième paramètre est une size valide 
       if(p1 == 2) Color.convolution(imageFilter, imageFilter,kernel); // filtre gaussien 
     }
     // pbm image couleur je pense 
@@ -78,10 +81,12 @@ public class ImageController {
       Color.convertGrey(imageFilter, imageFilter);
       Color.gradientImageSobel(imageFilter, imageFilter);
     }
-    else if(algo.equals("histogramme")){Color.histo(imageFilter, p1);}
+    else if(algo.equals("histogramme")){Color.histo(imageFilter);}
     ////////////////////////////////////////////////////////////
    
-    else if(algo.equals("color")){Color.color(imageFilter,imageFilter,p1-1,p2);}
+    else if(algo.equals("color")){
+      if (p2<-255 ||p2>255) return new ResponseEntity<>("Algo not found.", HttpStatus.BAD_REQUEST); //verification du delta entre -255 et 255
+      Color.color(imageFilter,imageFilter,p1-1,p2);}
     else{
       // faire cas trop de paramètre pour l'algo + cas mauvais parametre 
       return new ResponseEntity<>("Algo not found.", HttpStatus.BAD_REQUEST);

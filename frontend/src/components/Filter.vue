@@ -186,7 +186,7 @@ function applyColor(){
         <option id="c2">Vert</option>
         <option id="c3">Bleu</option>
       </select>
-      <input v-if="selectedAlgo == 'changeLum' || selectedAlgo == 'histogramme'" v-model="selectedParam">
+      <input v-if="selectedAlgo == 'changeLum' " v-model="selectedParam">
       <input v-if="selectedOptionFlou == 'Moyenneur' || selectedAlgo == 'color'" v-model="selectedParam2">
       <button v-if="selectedAlgo == 'flou'" @click="applyFlou">Apply</button>
       <button v-if="selectedAlgo == 'color'" @click="applyColor">Apply</button>
