@@ -1,5 +1,7 @@
 package pdl.backend;
 
+import org.apache.tomcat.util.http.parser.MediaType;
+
 public class Image {
   private static Long count = Long.valueOf(0);
   private Long id;
@@ -15,7 +17,6 @@ public class Image {
   public long getId() {
     return id;
   }
-
   public String getName() {
     return name;
   }

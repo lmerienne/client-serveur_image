@@ -1,5 +1,8 @@
 Token : _J2NruQgU2tCLjojdGkD
+
 cmd : mvn --projects backend spring-boot:run
+
+export PATH=/opt/users/Node.js/bin:$PATH
 
 besoin 1    ok      FAIRE TEST
 besoin 2    cas suppression 
