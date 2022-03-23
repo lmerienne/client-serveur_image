@@ -82,7 +82,7 @@ public class ImageController {
       if (p2<=0) return new ResponseEntity<>("Algo not found.", HttpStatus.BAD_REQUEST); //test si le deuxième paramètre est une size valide 
 
       if(p1 == 2) Color.convolution(imageFilter, imageFilter,kernel); // filtre gaussien 
-    }
+    } 
 
     else if(algo.equals("contour")){
       Color.convertGrey(imageFilter, imageFilter);
