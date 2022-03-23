@@ -76,7 +76,6 @@ public class ImageController {
     }   
 
     else if(algo.equals("flou")){
-      // changer nom fct dans arbre deroulant (mettre nom anglais)
       int[][] kernel = {{1,2,3,2,1},{2,6,8,6,2},{3,8,10,8,3},{2,6,8,6,2},{1,2,3,2,1}};
       if(p1 == 1) Color.meanFilterSimple(imageFilter, imageFilter, p2); // filtre moyenneur + p2 intensité flou
 
@@ -91,7 +90,6 @@ public class ImageController {
     }
 
     else if(algo.equals("histogramme")){Color.histo(imageFilter);}
-    ////////////////////////////////////////////////////////////
    
     else if(algo.equals("color")){
       if (p2<-255 ||p2>255) return new ResponseEntity<>("Algo not found.", HttpStatus.BAD_REQUEST); //verification du delta entre -255 et 255
@@ -125,7 +123,7 @@ public class ImageController {
     return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(new InputStreamResource(inputStream));
   }
 /*
-  Les trois prochaines fonctions sont du même style ce sont elles qui permettent de récuperer si le client
+  Les trois prochaines fonctions sont du même style ,ce sont elles qui permettent de récuperer si le client
 à besoin d'une fonction avec zéro (withoutParameter), un (withOneParameter) ou deux (withTwoParameter)
 paramètres elles appelent notre fonction applyFilter. Elles renvoient ensuite l'image si 
 elle existe au client. 
@@ -143,7 +141,6 @@ elle existe au client.
 
   @RequestMapping(value = "/images/{id}", params = {"algorithm", "p1","p2"}, method = RequestMethod.GET)
   public ResponseEntity<?> withTwoParameter(@RequestParam("algorithm") String algo,@RequestParam("p1") int p1,@RequestParam("p2") int p2,@PathVariable long id) throws IOException {
-   
     return applyFilter(algo, p1, p2, id);
   }
   
