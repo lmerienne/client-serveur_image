@@ -23,20 +23,20 @@ function getImageList() {
   });
 }
 
-
+///////// Affiche l'image selectionnée avant de lui appliquer //////////
 function showImage2() {
     const id = selectedId.value;
     api.getImage(id)
   .then((data: Blob) => {
     const reader = new window.FileReader();
-    reader.readAsDataURL(data);
+    reader.readAsDataURL(data);                                                     // Création d'un URL cliquable menant vers l'image affichée pour la télécharger.
     reader.onload = () => {
       const galleryElt = document.getElementById("gallery");
       if (galleryElt !== null) {
         const imgElt = document.createElement("img");
-        if(galleryElt.hasChildNodes()){
-            galleryElt.replaceChildren(imgElt);
-        }else{
+        if(galleryElt.hasChildNodes()){                                             // Vérifie si un childNode est déjà présent, si oui, le remplace,
+            galleryElt.replaceChildren(imgElt);                                     // sinon, en crée un nouveau. Permet d'éviter l'ajout de multiple fils au noeud
+        }else{                                                                      // et l'affichage des anciennes photos.
             galleryElt.appendChild(imgElt);
         }
         if (imgElt !== null && reader.result as string) {
@@ -49,10 +49,22 @@ function showImage2() {
     console.log(e.message);
   });
 }
+//////////////////////////////////////////////////////////////////////////
 
+
+
+//////////////////////////////////////////////////////////////////////////
+//                                                                      //
+//  Appel une des trois fonctions de l'api .withoutParameter ,          //
+//  .withOneParameter , .withTwoParameter , en fonction du nombre de    //
+//  paramètres nécéssaires au filtre passé en paramètre.                //
+//  Affiche l'image avec le filtre appliqué et crée un URL pour pouvoir // 
+//  la télécharger.                                                     //
+//                                                                      //
+////////// Application du filtre et affichage de l'image /////////////////
 function applyFilter() {
   if (selectedParam2.value && selectedParam.value){
-  api.withTwoParameter(selectedAlgo.value, selectedParam.value, selectedParam2.value, selectedId.value)
+  api.withTwoParameter(selectedAlgo.value, selectedParam.value, selectedParam2.value, selectedId.value)            // Requête axios pour les filtres ayant besoin de 2 paramètres
     .then((data: Blob) => {
     const reader = new window.FileReader();
     console.log("2 param")
@@ -81,7 +93,7 @@ function applyFilter() {
   });
   }
   else if (selectedParam.value){
-    api.withOneParameter(selectedAlgo.value, selectedParam.value, selectedId.value )
+    api.withOneParameter(selectedAlgo.value, selectedParam.value, selectedId.value )                                // Requête axios pour les filtres ayant besoin de 1 paramètre
     .then((data: Blob) => {
     const reader = new window.FileReader();
     console.log("1 params")
@@ -109,7 +121,7 @@ function applyFilter() {
   });
   }
   else{
-    api.withoutParameter(selectedAlgo.value, selectedId.value)
+    api.withoutParameter(selectedAlgo.value, selectedId.value)                                                      // Requête axios pour les filtres n'ayant pas besoin de paramètres
     .then((data: Blob) => {
     const reader = new window.FileReader();
     console.log("no param")
@@ -137,6 +149,7 @@ function applyFilter() {
   });
   }
 }
+/////////////////////////////////////////////////////////////////////////
 
 function downloadImage(){
   console.log(link)
@@ -144,13 +157,13 @@ function downloadImage(){
 }
 
 function applyFlou(){
-  if(selectedOptionFlou.value == "Moyenneur"){ selectedParam.value = 1;}
-  else{ selectedParam.value = 2;}
+  if(selectedOptionFlou.value == "Moyenneur"){ selectedParam.value = 1;}                                // Fonction intermédiaire pour permettre une meilleure compréhension
+  else{ selectedParam.value = 2;}                                                                       // lors du choix des options pour le filtre flou.          
   applyFilter();
 }
 
 function applyColor(){
-  if(selectedOptionColor.value == "Rouge"){ selectedParam.value = 1;}
+  if(selectedOptionColor.value == "Rouge"){ selectedParam.value = 1;}                                   // Fonction intermédiaire pour les mêmes raisons qu'au dessus.
   else if(selectedOptionColor.value == "Vert"){ selectedParam.value = 2;}
   else{ selectedParam.value = 3;}
   applyFilter();
@@ -200,7 +213,7 @@ function applyColor(){
 
 <style scoped>
 img{
-    max-width: 50%;
+    max-width: 50%;       /* Redimension de l'image en fonction de la taille de la fenêtre */
     max-height: 5%;
   }
 </style>
