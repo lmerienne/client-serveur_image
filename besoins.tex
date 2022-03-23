@@ -109,10 +109,6 @@ couleur enregistrées aux formats suivants :
   \begin{enumerate}
   \item Lancement de l'exécutable depuis un environnement vide, une erreur doit
     se déclencher indiquant que le dossier \verb!images! n'est pas présent.
-  \item Mise en place d'un dossier de test contenant au moins 2 niveaux de
-    profondeur dans l'arborescence.
-    Le dossier contiendra des documents avec des extensions non-reconnues comme
-    étant des images (e.g. \verb!.txt!).
   \end{enumerate}
 }
 
@@ -157,7 +153,7 @@ le paragraphe "Gestion d'erreurs".\\
   \begin{description}
   \item[Id:] L'identifiant auquel est accessible l'image (type \verb!long!)
   \item[Name:] Le nom du fichier qui a servi à construire l'image (type \verb!string!)
-  \item[Type:] Le type de l'image (type \verb!org.springframework.http.MediaType!) 
+  \item[Type:] Le type de l'image (type \verb!jpg,png) 
   \item[Size:] Une description de la taille de l'image, par exemple \verb!640*480*3! pour
     une image en couleur de $640 \times 480$ pixels (type \verb!string!)
   \end{description}

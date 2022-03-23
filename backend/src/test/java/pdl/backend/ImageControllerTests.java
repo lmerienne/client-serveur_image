@@ -95,5 +95,11 @@ public class ImageControllerTests {
         MockMultipartFile mmf = new MockMultipartFile ("file", "test.jpg","image/xcx", Files.readAllBytes(cpr.getFile().toPath()));
         this.mockMvc.perform(MockMvcRequestBuilders.multipart("/images").file(mmf)).andExpect(status().isUnsupportedMediaType());
     }
-
+    @Test
+    @Order(9)
+    public void lunchVoidExecutable() throws Exception {
+        /* Le type xcx n'est pas supporté et renverra une erreur */
+        
+        this.mockMvc.perform(MockMvcRequestBuilders.multipart("/imagesTestFile")).andExpect(status().isNotFound());
+    }
 }

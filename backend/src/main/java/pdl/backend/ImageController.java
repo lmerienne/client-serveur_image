@@ -52,68 +52,84 @@ public class ImageController {
   public ImageController(ImageDao imageDao) {
     this.imageDao = imageDao;
   }
+  /*  
+    La fonction applyFilter prend quatre paramètres qui sont ensuite utilisés suivant le nom de 
+  l'agorithme passé en paramètre (String algo), ce nom permet d'appeler la fonction du même nom,
+  avec les paramètres qui sont donnés. 
+  */
   public ResponseEntity<?> applyFilter(String algo,int p1,int p2, long id) throws IOException {
     System.out.println("algo : " + algo + " sur image = "+imageDao.retrieve(id).get().getName());
-    Optional<Image> image = imageDao.retrieve(id);
+    Optional<Image> image = imageDao.retrieve(id); 
     BufferedImage input = null;
+    //transforme l'image optional en image buffered:
     if (image.isPresent()) {
       InputStream inputStream = new ByteArrayInputStream(image.get().getData());
       input = ImageIO.read(inputStream);
     }else{
       return new ResponseEntity<>("Image id=" + id + " not found.", HttpStatus.NOT_FOUND);
     }
-    // PBM  :  input null avec image upload
-
+    //appel des fonctions de Color
     Planar<GrayU8> imageFilter = ConvertBufferedImage.convertFromPlanar(input, null, true, GrayU8.class);
     if(algo.equals("changeLum")){
       if (p1<-255 ||p1>255) return new ResponseEntity<>("Algo not found.", HttpStatus.BAD_REQUEST); //verification du delta entre -255 et 255
-      Color.changeLum(imageFilter,p1);}     
+      Color.changeLum(imageFilter,p1);
+    }   
+
     else if(algo.equals("flou")){
       // changer nom fct dans arbre deroulant (mettre nom anglais)
       int[][] kernel = {{1,2,3,2,1},{2,6,8,6,2},{3,8,10,8,3},{2,6,8,6,2},{1,2,3,2,1}};
       if(p1 == 1) Color.meanFilterSimple(imageFilter, imageFilter, p2); // filtre moyenneur + p2 intensité flou
+
       if (p2<=0) return new ResponseEntity<>("Algo not found.", HttpStatus.BAD_REQUEST); //test si le deuxième paramètre est une size valide 
+
       if(p1 == 2) Color.convolution(imageFilter, imageFilter,kernel); // filtre gaussien 
     }
-    // pbm image couleur je pense 
+
     else if(algo.equals("contour")){
-      // Pas bon car faut que ca marche en niveau de gris ???
       Color.convertGrey(imageFilter, imageFilter);
       Color.gradientImageSobel(imageFilter, imageFilter);
     }
+
     else if(algo.equals("histogramme")){Color.histo(imageFilter);}
     ////////////////////////////////////////////////////////////
    
     else if(algo.equals("color")){
       if (p2<-255 ||p2>255) return new ResponseEntity<>("Algo not found.", HttpStatus.BAD_REQUEST); //verification du delta entre -255 et 255
-      Color.color(imageFilter,imageFilter,p1-1,p2);}
+      Color.color(imageFilter,imageFilter,p1-1,p2);
+    }
+
     else{
-      // faire cas trop de paramètre pour l'algo + cas mauvais parametre 
       return new ResponseEntity<>("Algo not found.", HttpStatus.BAD_REQUEST);
     }
 
     // FIN application filtre
-    String sku = "src/main/resources/images/"+ algo + "_" +imageDao.retrieve(id).get().getName();          
+    //téléchargement de l'image
+    String chemin = "src/main/resources/images/"+ algo + "_" +imageDao.retrieve(id).get().getName();          
         
-    UtilImageIO.saveImage(imageFilter, sku);    
-    System.out.println("image modifiée");
-
-    BufferedImage ski =UtilImageIO.loadImageNotNull(sku);
+    UtilImageIO.saveImage(imageFilter, chemin);    
+    //recupération de l'image téléchargée
+    BufferedImage imageLoad =UtilImageIO.loadImageNotNull(chemin);
     ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
-    String fe = getExtension(sku);
+    String fe = getExtension(chemin);
     try {
-      ImageIO.write(ski, fe, bos);
-      Files.delete(Paths.get(sku));
+      //supression de l'image dans le dossier car utilisée juste pour récuperer le inpustream
+      ImageIO.write(imageLoad, fe, bos);
+      Files.delete(Paths.get(chemin));
     } catch (IOException e) {
       e.printStackTrace();
     }                                                                  
     InputStream inputStream = new ByteArrayInputStream(bos.toByteArray());
 
-    // return HttpStatus.OK pour code 2OO!!
+    // return HttpStatus.OK pour code 2OO!! + renvois l'image au client
     return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(new InputStreamResource(inputStream));
   }
-
+/*
+  Les trois prochaines fonctions sont du même style ce sont elles qui permettent de récuperer si le client
+à besoin d'une fonction avec zéro (withoutParameter), un (withOneParameter) ou deux (withTwoParameter)
+paramètres elles appelent notre fonction applyFilter. Elles renvoient ensuite l'image si 
+elle existe au client. 
+*/ 
   @RequestMapping(value = "/images/{id}", params = {"algorithm"}, method = RequestMethod.GET)
   public ResponseEntity<?> withoutParameter(@RequestParam("algorithm") String algo,@PathVariable long id) throws IOException {
     return applyFilter(algo, 0, 0, id);
@@ -178,33 +194,21 @@ public class ImageController {
     ArrayNode nodes = mapper.createArrayNode();
     for (Image image : images) {
       ObjectNode objectNode = mapper.createObjectNode();
-      objectNode.put("id", image.getId());
-      objectNode.put("name", image.getName());
-      String fe = getExtension(image.getName()); 
-
-      
-      
+      objectNode.put("id", image.getId());//récupération de l'id de l'image
+      objectNode.put("name", image.getName());//récupération du nom 
+      String fe = getExtension(image.getName());//récupération de l'extension
       objectNode.put("type",fe);
+      BufferedImage input = null;
+      InputStream inputStream = new ByteArrayInputStream(image.getData());
+      input = ImageIO.read(inputStream);//création de l'image pour récupérer la taille
 
-      /* // marche pas si uplaod img 
-      Optional<Image> t = imageDao.retrieve(image.getId());
-      InputStream inputStream = new ByteArrayInputStream(t.get().getData());
-      BufferedImage input = ImageIO.read(inputStream);
-      Planar<GrayU8> i = ConvertBufferedImage.convertFromPlanar(input, null, true, GrayU8.class);
-      objectNode.put("size",i.getHeight() + "x" + i.getWidth() + "x" + i.getNumBands());
-      */
-    BufferedImage input = null;
-    InputStream inputStream = new ByteArrayInputStream(image.getData());
-    input = ImageIO.read(inputStream);
-    // PBM  :  input null avec image upload
-
-    Planar<GrayU8> imagePlanar = ConvertBufferedImage.convertFromPlanar(input, null, true, GrayU8.class);
-      objectNode.put("size",imagePlanar.getWidth()+"x"+imagePlanar.getHeight()+"x"+imagePlanar.getNumBands());//imageDao.retrieve(image.getId()));
+      Planar<GrayU8> imagePlanar = ConvertBufferedImage.convertFromPlanar(input, null, true, GrayU8.class);
+      objectNode.put("size",imagePlanar.getWidth()+"x"+imagePlanar.getHeight()+"x"+imagePlanar.getNumBands());//récupération de la taille
       nodes.add(objectNode);
     }
     return nodes;
   }
-
+//fonction qui récuperer l'extension de l'image
   public String getExtension(String s){
     String fe = "";
 		  int i = s.lastIndexOf('.');
