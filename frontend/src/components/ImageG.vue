@@ -1,8 +1,18 @@
 <script setup lang="ts">
+
+
+/* Fichier spécifique pour afficher les images de la galerie
+   pour éviter d'avoir les boutons delete et dowload du 
+   Image.vue sous chaques images*/
+
+
 import { defineProps, ref } from 'vue';
 import { api } from '@/http-api';
 
 const props = defineProps<{ id: number }>()
+
+
+//////////// Affiche l'image correspondante à l'id ////////////
 
 api.getImage(props.id)
   .then((data: Blob) => {
@@ -22,7 +32,7 @@ api.getImage(props.id)
   .catch(e => {
     console.log(e.message);
   });
-
+////////////////////////////////////////////////////////////////
 </script>
 
 <template>
@@ -32,7 +42,7 @@ api.getImage(props.id)
 <style>
   img{
     max-width: 20%;
-    max-height: 5%;
+    max-height: 5%;             /* Redimensionne les images en fonction de la taille de la fenêtre */
     padding-right: 5px;
   }
 </style>
