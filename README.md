@@ -38,3 +38,13 @@ qui ne passent pas. Malgré ces erreurs, la compilation se fait bien.
 
 Notre implémentation des filtres n'est pas parfaite (pas de correction depuis le rendu du devoir), il se peut qu'il
 y ai quelques problèmes lors de l'application de certains.
+
+***
+## Application des filtres (URL) :
+***
+ Exemple d'appel pour le filtre de changement  de luminosité:
+ ```
+http://localhost:8080/images/0?algorithm=changeLum&p1=1
+ ```
+ Pour les appels des filtres avec plusieurs paramètres utiliser p1=X et p2=Y (si besoin de deux paramètres).
+ ***
