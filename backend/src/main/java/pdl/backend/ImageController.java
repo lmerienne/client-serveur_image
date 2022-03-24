@@ -31,6 +31,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
+import boofcv.struct.border.BorderType;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.Planar;
 import java.awt.image.BufferedImage;
@@ -72,7 +73,7 @@ public class ImageController {
 
     else if(algo.equals("flou")){
       int[][] kernel = {{1,2,3,2,1},{2,6,8,6,2},{3,8,10,8,3},{2,6,8,6,2},{1,2,3,2,1}};
-      if(p1 == 1) Color.meanFilterSimple(imageFilter, imageFilter, p2); // filtre moyenneur + p2 intensité flou
+      if(p1 == 1) Color.meanFilterWithBorders(imageFilter, imageFilter, p2, BorderType.EXTENDED); // filtre moyenneur + p2 intensité flou
 
       if (p2<=0) return new ResponseEntity<>("Algo not found.", HttpStatus.BAD_REQUEST); //test si le deuxième paramètre est une size valide 
 

@@ -36,7 +36,7 @@ public static void meanFilterSimple(Planar<GrayU8> input, Planar<GrayU8> output,
 
 public static void meanFilterWithBorders(Planar<GrayU8> input, Planar<GrayU8> output, int size, BorderType borderType) {
     for (int i = 0; i < input.getNumBands(); ++i){
-      Convolution.meanFilterWithBorders(input.getBand(i), output.getBand(i), size, BorderType.EXTENDED );
+      Convolution.meanFilterWithBorders(input.getBand(i), output.getBand(i), size, borderType);
     }
 }
 
