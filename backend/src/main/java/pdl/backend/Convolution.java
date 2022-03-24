@@ -1,15 +1,5 @@
 package pdl.backend;
-
-import java.util.concurrent.ForkJoinPool;
-
-import org.ejml.interfaces.SolveNullSpace;
-
-import boofcv.alg.filter.blur.GBlurImageOps;
-import boofcv.alg.filter.convolve.GConvolveImageOps;
-import boofcv.io.image.UtilImageIO;
 import boofcv.struct.border.BorderType;
-import boofcv.struct.convolve.Kernel1D_S32;
-import boofcv.struct.convolve.Kernel2D_S32;
 import boofcv.struct.image.GrayU8;
 
 public class Convolution {

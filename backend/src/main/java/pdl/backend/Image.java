@@ -1,6 +1,5 @@
 package pdl.backend;
 
-import org.apache.tomcat.util.http.parser.MediaType;
 
 public class Image {
   private static Long count = Long.valueOf(0);

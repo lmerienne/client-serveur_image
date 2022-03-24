@@ -1,14 +1,5 @@
 package pdl.backend;
-
-import java.awt.image.BufferedImage;
-import java.sql.Array;
-
-import boofcv.alg.misc.ImageStatistics;
-import boofcv.io.image.*;
-import boofcv.io.image.UtilImageIO;
 import boofcv.struct.image.GrayU8;
-import boofcv.struct.image.Planar;
-
 
 public class GrayLevelProcessing {
 

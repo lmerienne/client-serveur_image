@@ -1,22 +1,5 @@
 package pdl.backend;
-
-import java.awt.image.BufferedImage;
-import java.util.concurrent.ForkJoinPool;
-
-import javax.lang.model.util.ElementScanner6;
-
-import org.ddogleg.optimization.ConvergeOptParam;
-import org.ejml.interfaces.SolveNullSpace;
-
-import boofcv.alg.color.ColorHsv;
-import boofcv.alg.filter.blur.GBlurImageOps;
-import boofcv.alg.filter.convolve.GConvolveImageOps;
-import boofcv.factory.background.ConfigBackgroundBasic;
-import boofcv.io.image.ConvertBufferedImage;
-import boofcv.io.image.UtilImageIO;
 import boofcv.struct.border.BorderType;
-import boofcv.struct.convolve.Kernel1D_S32;
-import boofcv.struct.convolve.Kernel2D_S32;
 import boofcv.struct.image.GrayU8;
 import boofcv.struct.image.Planar;
 
