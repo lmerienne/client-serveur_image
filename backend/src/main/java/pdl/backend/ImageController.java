@@ -2,6 +2,7 @@ package pdl.backend;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -48,35 +49,44 @@ public class ImageController {
   public ImageController(ImageDao imageDao) {
     this.imageDao = imageDao;
   }
-  /*  
-    La fonction applyFilter prend quatre paramètres qui sont ensuite utilisés suivant le nom de 
-  l'agorithme passé en paramètre (String algo), ce nom permet d'appeler la fonction du même nom,
-  avec les paramètres qui sont donnés. 
-  */
+
+//////////////////////////////////////////////////////////////////////////
+//                                                                      //
+//  Appellée par une fonction annexe.                                   //
+//  Traite les informations liées au filtre et aux paramètres voulant //
+//  être appliqués ainsi que l'id de l'image.                           //
+//                                                                      //
+//  Vérifie la validité des données puis applique le filtre et          //
+//  renvoie l'image modifiée.                                           //
+//                                                                      //
+//////////// Application du filtre et renvoie de l'image /////////////////
+
   public ResponseEntity<?> applyFilter(String algo,int p1,int p2, long id) throws IOException {
     System.out.println("algo : " + algo + " sur image = "+imageDao.retrieve(id).get().getName());
     Optional<Image> image = imageDao.retrieve(id); 
     BufferedImage input = null;
-    //transforme l'image optional en image buffered:
+
+    //Convertion de type
     if (image.isPresent()) {
       InputStream inputStream = new ByteArrayInputStream(image.get().getData());
       input = ImageIO.read(inputStream);
     }else{
       return new ResponseEntity<>("Image id=" + id + " not found.", HttpStatus.NOT_FOUND);
     }
-    //appel des fonctions de Color
+
+    //appel fonctions filtre
     Planar<GrayU8> imageFilter = ConvertBufferedImage.convertFromPlanar(input, null, true, GrayU8.class);
     if(algo.equals("changeLum")){
-      if (p1<-255 ||p1>255) return new ResponseEntity<>("Algo not found.", HttpStatus.BAD_REQUEST); //verification du delta entre -255 et 255
+      if (p1<-255 ||p1>255) return new ResponseEntity<>("Algo not found.", HttpStatus.BAD_REQUEST); //test paramètre
       Color.changeLum(imageFilter,p1);
     }   
 
     else if(algo.equals("flou")){
       int[][] kernel = {{1,2,3,2,1},{2,6,8,6,2},{3,8,10,8,3},{2,6,8,6,2},{1,2,3,2,1}};
-      if(p1 == 1) Color.meanFilterWithBorders(imageFilter, imageFilter, p2, BorderType.EXTENDED); // filtre moyenneur + p2 intensité flou
-
-      if (p2<=0) return new ResponseEntity<>("Algo not found.", HttpStatus.BAD_REQUEST); //test si le deuxième paramètre est une size valide 
-
+      if(p1 == 1){
+        if (p2<0) return new ResponseEntity<>("Algo not found.", HttpStatus.BAD_REQUEST); // test paramètre
+        Color.meanFilterWithBorders(imageFilter, imageFilter, p2, BorderType.EXTENDED); // filtre moyenneur + p2 intensité flou
+      }
       if(p1 == 2) Color.convolution(imageFilter, imageFilter,kernel); // filtre gaussien 
     } 
 
@@ -95,35 +105,38 @@ public class ImageController {
     else{
       return new ResponseEntity<>("Algo not found.", HttpStatus.BAD_REQUEST);
     }
+    // FIN  partie application filtre
 
-    // FIN application filtre
-    //téléchargement de l'image
-    String chemin = "src/main/resources/images/"+ algo + "_" +imageDao.retrieve(id).get().getName();          
-        
+    //Sauvegarde et récupération de l'image avec filtre
+    String chemin = "src/main/resources/images/"+ algo + "_" +imageDao.retrieve(id).get().getName();           
     UtilImageIO.saveImage(imageFilter, chemin);    
-    //recupération de l'image téléchargée
     BufferedImage imageLoad =UtilImageIO.loadImageNotNull(chemin);
     ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
     String fe = getExtension(chemin);
     try {
-      //supression de l'image dans le dossier car utilisée juste pour récuperer le inpustream
+      //Stock puis supprime l'image avec filtre du serveur 
       ImageIO.write(imageLoad, fe, bos);
       Files.delete(Paths.get(chemin));
     } catch (IOException e) {
       e.printStackTrace();
     }                                                                  
     InputStream inputStream = new ByteArrayInputStream(bos.toByteArray());
-
-    // return HttpStatus.OK pour code 2OO!! + renvois l'image au client
     return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(new InputStreamResource(inputStream));
   }
-/*
-  Les trois prochaines fonctions sont du même style ,ce sont elles qui permettent de récuperer si le client
-à besoin d'une fonction avec zéro (withoutParameter), un (withOneParameter) ou deux (withTwoParameter)
-paramètres elles appelent notre fonction applyFilter. Elles renvoient ensuite l'image si 
-elle existe au client. 
-*/ 
+
+//////////////////////////////////////////////////////////////////////////
+//                                                                      //
+//  Appellées lors d'une requete URL ou d'un appel du client.           //
+//                                                                      //
+//  Récupèrent les informations liées au filtre et aux paramètres       //
+//  voulant être appliqués ainsi que l'id de l'image.                   //
+//                                                                      //
+//  Appellent la fonction applyFilter() avec les paramètres de la       //
+//  requête.                                                            //
+//                                                                      //
+/////////////// Récupère les données et les transfère ////////////////////
+
   @RequestMapping(value = "/images/{id}", params = {"algorithm"}, method = RequestMethod.GET)
   public ResponseEntity<?> withoutParameter(@RequestParam("algorithm") String algo,@PathVariable long id) throws IOException {
     return applyFilter(algo, 0, 0, id);
@@ -140,6 +153,27 @@ elle existe au client.
     return applyFilter(algo, p1, p2, id);
   }
   
+  /////////////////
+
+
+  @RequestMapping(value = "/images", params = {"name"}, method = RequestMethod.GET)
+  public ResponseEntity<?> createFolder(@RequestParam("name") String folderName) {
+
+    File dossier = new File("src/main/resources/images/" + folderName);
+    //True si créé, False sinon
+    boolean res = dossier.mkdir();
+
+    if(res) System.out.println("Le dossier \"" + folderName+ "\" a été créé.");
+    else System.out.println("Le dossier \"" + folderName+ "\" existe déja.");
+    
+    return new ResponseEntity<>("Cool! ", HttpStatus.OK);
+  }
+
+
+
+
+
+  ///////////////
   @RequestMapping(value = "/images/{id}", method = RequestMethod.GET, produces = MediaType.IMAGE_JPEG_VALUE)
   public ResponseEntity<?> getImage(@PathVariable("id") long id) {
 
