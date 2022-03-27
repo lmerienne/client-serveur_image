@@ -156,19 +156,40 @@ public class ImageController {
   /////////////////
 
 
-  @RequestMapping(value = "/images", params = {"name"}, method = RequestMethod.GET)
-  public ResponseEntity<?> createFolder(@RequestParam("name") String folderName) {
+  // URL : créer dossier : /images?create=XXX
+  @RequestMapping(value = "/images", params = {"create"}, method = RequestMethod.GET)
+  public ResponseEntity<?> createFolder(@RequestParam("create") String folderName) {
 
     File dossier = new File("src/main/resources/images/" + folderName);
     //True si créé, False sinon
     boolean res = dossier.mkdir();
-
+    
+    //Dossier dos = new Dossier(imageDao); // creer une liste de dossier ???
+    // pour pouvoir creer une liste dao dans dos et utiliser les fct de dao ???
     if(res) System.out.println("Le dossier \"" + folderName+ "\" a été créé.");
     else System.out.println("Le dossier \"" + folderName+ "\" existe déja.");
     
-    return new ResponseEntity<>("Cool! ", HttpStatus.OK);
+    return new ResponseEntity<>("Cool :3 ! ", HttpStatus.OK);
   }
 
+  // URL : supprimer dossier : /images?delete=XXX
+  @RequestMapping(value = "/images", params = {"delete"}, method = RequestMethod.GET)
+  public ResponseEntity<?> deleteFolder(@RequestParam("delete") String folderName) {
+    File dossier = new File("src/main/resources/images/" + folderName);
+
+    if(dossier.delete()) System.out.println("Le dossier \"" + folderName+ "\" a été supprimé");
+    else System.out.println("Le dossier \"" + folderName+ "\" n'éxiste pas.");
+
+    return new ResponseEntity<>("Cool Supprimé :3 ! ", HttpStatus.OK);
+  }
+
+  ////pas fait
+  @RequestMapping(value = "/images", params = {"liste"}, method = RequestMethod.GET, produces = "application/json")
+  @ResponseBody
+  public ArrayNode getFolderList(@RequestParam("liste") String folderName ) {
+    ArrayNode nodes = mapper.createArrayNode();
+    return nodes;
+  }
 
 
 
