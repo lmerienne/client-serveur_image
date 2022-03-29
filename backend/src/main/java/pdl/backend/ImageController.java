@@ -16,6 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import org.apache.catalina.valves.rewrite.QuotedStringTokenizer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
@@ -44,6 +45,9 @@ public class ImageController {
   private ObjectMapper mapper;
 
   private final ImageDao imageDao;
+
+  public Folder[] listFolder = new Folder[10];
+  public int nbCurrentFolder = 0;
 
   @Autowired
   public ImageController(ImageDao imageDao) {
@@ -154,46 +158,83 @@ public class ImageController {
   }
   
   /////////////////
+  ////////////////
 
 
   // URL : créer dossier : /images?create=XXX
   @RequestMapping(value = "/images", params = {"create"}, method = RequestMethod.GET)
   public ResponseEntity<?> createFolder(@RequestParam("create") String folderName) {
 
-    File dossier = new File("src/main/resources/images/" + folderName);
-    //True si créé, False sinon
-    boolean res = dossier.mkdir();
-    
-    //Dossier dos = new Dossier(imageDao); // creer une liste de dossier ???
-    // pour pouvoir creer une liste dao dans dos et utiliser les fct de dao ???
-    if(res) System.out.println("Le dossier \"" + folderName+ "\" a été créé.");
+    if(!existFolder(folderName)){
+      System.out.println("Le dossier \"" + folderName+ "\" a été créé.");
+      // ajout du nouveau dossier dans la liste !
+      ImageDao Dao = new ImageDao();
+      Dao.removeAll();
+      System.out.println(Dao.retrieveAll());
+      Folder dos = new Folder(Dao,folderName,1);
+      listFolder[nbCurrentFolder] = dos;
+      nbCurrentFolder++;
+    }
     else System.out.println("Le dossier \"" + folderName+ "\" existe déja.");
-    
-    return new ResponseEntity<>("Cool :3 ! ", HttpStatus.OK);
+    displayListFolder(); // print à supprimer si besoin
+    return new ResponseEntity<>("Cool nouveau dossier :3 ! ", HttpStatus.OK);
   }
 
   // URL : supprimer dossier : /images?delete=XXX
   @RequestMapping(value = "/images", params = {"delete"}, method = RequestMethod.GET)
   public ResponseEntity<?> deleteFolder(@RequestParam("delete") String folderName) {
-    File dossier = new File("src/main/resources/images/" + folderName);
 
-    if(dossier.delete()) System.out.println("Le dossier \"" + folderName+ "\" a été supprimé");
+    if(existFolder(folderName)){
+      System.out.println("Le dossier \"" + folderName+ "\" a été supprimé");
+      deleteFolderFromList(folderName);
+    }
     else System.out.println("Le dossier \"" + folderName+ "\" n'éxiste pas.");
 
+    displayListFolder(); // print à supprimer si besoin 
     return new ResponseEntity<>("Cool Supprimé :3 ! ", HttpStatus.OK);
   }
 
-  ////pas fait
+  // trouver moyen de factoriser fct avec getImageList
+  // URL : supprimer dossier : /images?liste=XXX
   @RequestMapping(value = "/images", params = {"liste"}, method = RequestMethod.GET, produces = "application/json")
   @ResponseBody
-  public ArrayNode getFolderList(@RequestParam("liste") String folderName ) {
+  public ArrayNode getImageListFromFolder(@RequestParam("liste") String folderName) throws IOException {
+    int idFolder = idFromName(folderName);
+    //
+    List<Image> images = listFolder[idFolder].getImageDao().retrieveAll();
     ArrayNode nodes = mapper.createArrayNode();
+    if(nbCurrentFolder == 0) return nodes;
+    for (Image image : images) {
+      ObjectNode objectNode = mapper.createObjectNode();
+      objectNode.put("id", image.getId());//récupération de l'id de l'image
+      objectNode.put("name", image.getName());//récupération du nom 
+      String fe = getExtension(image.getName());//récupération de l'extension
+      objectNode.put("type",fe);
+      BufferedImage input = null;
+      InputStream inputStream = new ByteArrayInputStream(image.getData());
+      input = ImageIO.read(inputStream);//création de l'image pour récupérer la taille
+
+      Planar<GrayU8> imagePlanar = ConvertBufferedImage.convertFromPlanar(input, null, true, GrayU8.class);
+      objectNode.put("size",imagePlanar.getWidth()+"x"+imagePlanar.getHeight()+"x"+imagePlanar.getNumBands());//récupération de la taille
+      nodes.add(objectNode);
+    }
     return nodes;
   }
 
+  //faire fct qui renvoie dossier par name
+
+  // URL : supprimer dossier : /images?delete=XXX
+  @RequestMapping(value = "/images", params = {"add","id"}, method = RequestMethod.GET)
+  public ResponseEntity<?> addImageToFolder(@RequestParam("add") String folderName,@RequestParam("id") int id) {
+    int idFolder = idFromName(folderName);
+    Optional<Image> image = imageDao.retrieve(id);
+    listFolder[idFolder].addImage(image.get());
+    System.out.println("Ajout de l'image : " + image.get().getName() + " dans le dossier " + folderName);
+    return new ResponseEntity<>("Cool ajout image dans dossier :3 ! ", HttpStatus.OK);
+  }
 
 
-
+  ///////////////
   ///////////////
   @RequestMapping(value = "/images/{id}", method = RequestMethod.GET, produces = MediaType.IMAGE_JPEG_VALUE)
   public ResponseEntity<?> getImage(@PathVariable("id") long id) {
@@ -256,7 +297,8 @@ public class ImageController {
     }
     return nodes;
   }
-//fonction qui récuperer l'extension de l'image
+
+//Récupere l'extension du nom d'une image
   public String getExtension(String s){
     String fe = "";
 		  int i = s.lastIndexOf('.');
@@ -266,5 +308,49 @@ public class ImageController {
     return fe;
   }
 
+
+  // possibilité de supprimer via ID !!!!!!!!! si plus simple pour frontend
+
+  //Supprime un dossier à partir de son nom
+  public void deleteFolderFromList(String name){
+    for (int i = 0; i < nbCurrentFolder; i++) {
+      if(listFolder[i].getName().equals(name)){
+        for (int j = i; j < nbCurrentFolder-1; j++) 
+          listFolder[j] = listFolder[j+1];
+      } 
+    }
+    nbCurrentFolder--;
+  }
+
+  // Affiche les dossiers par noms ainsi que par position de création 
+  public void displayListFolder(){
+    System.out.println("Liste Dossier :");
+    if(nbCurrentFolder == 0) System.out.println("   Vide");
+    else{
+      for (int i = 0; i < nbCurrentFolder; i++) {
+        System.out.println("    Dossier " + i + " : " + listFolder[i].getName());
+      }
+    }
+  }
+
+  public int idFromName(String name){
+    if(nbCurrentFolder == 0) return -1;
+    else{
+      for (int i = 0; i < nbCurrentFolder; i++) 
+        if(listFolder[i].getName().equals(name))
+          return i; 
+    }
+    return -1; //Pas de dossier de ce nom
+  }
+
+  public Boolean existFolder(String name){
+    if(nbCurrentFolder == 0) return false;
+    for (int i = 0; i < nbCurrentFolder; i++) {
+      if( listFolder[i].getName().equals(name)) return true;     
+    }
+    return false;
+  }
+
+ 
  
 }

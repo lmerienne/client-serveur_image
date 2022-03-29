@@ -81,4 +81,11 @@ public class ImageDao implements Dao<Image> {
   public void delete(final Image img) {
     images.remove(img.getId());
   }
+
+  public void removeAll(){
+    for (long i = 0; i < images.size(); i++) {
+      if(images.get(i) != null)
+        images.remove(images.get(i).getId());
+    }
+  }
 }
