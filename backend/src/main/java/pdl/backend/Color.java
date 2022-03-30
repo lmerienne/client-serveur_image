@@ -51,7 +51,21 @@ public static void gradientImageSobel(Planar<GrayU8> input, Planar<GrayU8> outpu
 		Convolution.gradientImageSobel(input.getBand(i), output.getBand(i));
 	  }
 }
-
+public static void negatif(Planar<GrayU8> input, Planar<GrayU8> output){
+	for(int i= 0;i< input.getNumBands();i++){
+		Convolution.negatif(input.getBand(i), output.getBand(i));
+	}
+}
+public static void mirorHor(Planar<GrayU8> input, Planar<GrayU8> output){
+    for(int i= 0;i< input.getNumBands();i++){
+      Convolution.mirorHor(input.getBand(i), output.getBand(i));
+    }
+  }
+  public static void mirorVer(Planar<GrayU8> input, Planar<GrayU8> output){
+    for(int i= 0;i< input.getNumBands();i++){
+      Convolution.mirorVer(input.getBand(i), output.getBand(i));
+    }
+  }
 public static void convertGrey (Planar<GrayU8> input, Planar<GrayU8> output){
 	for (int y = 0; y < input.height; ++y) {
 		for (int x = 0; x < input.width; ++x) {

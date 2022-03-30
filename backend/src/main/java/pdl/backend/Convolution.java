@@ -38,8 +38,32 @@ public class Convolution {
       return max-(x - max);
     return x;
   }
-
-
+public static void negatif(GrayU8 input, GrayU8 output){
+  for (int x=0; x<input.getWidth(); x++){
+    for (int y = 0; y < input.height; y++) {
+      int r=input.get(x, y);
+      output.set(x, y, 255-r);
+    }
+  }
+}
+public static void mirorHor(GrayU8 input, GrayU8 output){
+  for (int x=0,j=input.width-1; x<input.getWidth(); x++, j--){
+    for (int y = 0,k=input.height-1; y < input.height; y++,k--) {
+      int r=input.get(x, y);
+      output.set(j, k, r);
+    }
+  }
+}
+public static void mirorVer(GrayU8 input, GrayU8 output){
+  for (int x=0,j=input.width-1; x<input.getWidth(); x++, j--){
+    for (int y = 0,k=input.height-1; y < input.height; y++,k--){
+      int r=input.get(x, y);
+      //int m= input.get(j, y);
+      //output.set(j, y, r);
+      output.set(j, y, r);
+    }
+  }
+}
   public static void meanFilterWithBorders(GrayU8 input, GrayU8 output, int size, BorderType borderType) {
   
     if(borderType == BorderType.SKIP){
