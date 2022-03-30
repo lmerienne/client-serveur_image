@@ -17,7 +17,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class ImageDao implements Dao<Image> {
 
-  private final Map<Long, Image> images = new HashMap<>();
+  private Map<Long, Image> images = new HashMap<>();
 
   public ImageDao() {
     try {
@@ -82,10 +82,7 @@ public class ImageDao implements Dao<Image> {
     images.remove(img.getId());
   }
 
-  public void removeAll(){
-    for (long i = 0; i < images.size(); i++) {
-      if(images.get(i) != null)
-        images.remove(images.get(i).getId());
-    }
+  public void resetHashMap(){
+    this.images = new HashMap<>();
   }
 }

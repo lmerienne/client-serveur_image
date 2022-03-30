@@ -159,17 +159,19 @@ public class ImageController {
   
   /////////////////
   ////////////////
+  //trouver moyen de factoriser fct getImageList et getImageListFromFolder
+  //faire cas erreur : ex : dossier existe pas
 
-
-  // URL : créer dossier : /images?create=XXX
-  @RequestMapping(value = "/images", params = {"create"}, method = RequestMethod.GET)
+  // dans terminal : curl -X POST "http://localhost:8080/images?create=XXX"
+  //crée le dossier si il n'existe pas 
+  @RequestMapping(value = "/images", params = {"create"}, method = RequestMethod.POST)
   public ResponseEntity<?> createFolder(@RequestParam("create") String folderName) {
 
     if(!existFolder(folderName)){
       System.out.println("Le dossier \"" + folderName+ "\" a été créé.");
       // ajout du nouveau dossier dans la liste !
       ImageDao Dao = new ImageDao();
-      Dao.removeAll();
+      Dao.resetHashMap();
       System.out.println(Dao.retrieveAll());
       Folder dos = new Folder(Dao,folderName,1);
       listFolder[nbCurrentFolder] = dos;
@@ -180,8 +182,9 @@ public class ImageController {
     return new ResponseEntity<>("Cool nouveau dossier :3 ! ", HttpStatus.OK);
   }
 
-  // URL : supprimer dossier : /images?delete=XXX
-  @RequestMapping(value = "/images", params = {"delete"}, method = RequestMethod.GET)
+  // dans terminal : curl -X DELETE "http://localhost:8080/images?delete=XXX"
+  // supprime le dossier s'il existe
+  @RequestMapping(value = "/images", params = {"delete"}, method = RequestMethod.DELETE)
   public ResponseEntity<?> deleteFolder(@RequestParam("delete") String folderName) {
 
     if(existFolder(folderName)){
@@ -195,7 +198,7 @@ public class ImageController {
   }
 
   // trouver moyen de factoriser fct avec getImageList
-  // URL : supprimer dossier : /images?liste=XXX
+  // URL : /images?liste=XXX
   @RequestMapping(value = "/images", params = {"liste"}, method = RequestMethod.GET, produces = "application/json")
   @ResponseBody
   public ArrayNode getImageListFromFolder(@RequestParam("liste") String folderName) throws IOException {
@@ -221,10 +224,9 @@ public class ImageController {
     return nodes;
   }
 
-  //faire fct qui renvoie dossier par name
-
-  // URL : supprimer dossier : /images?delete=XXX
-  @RequestMapping(value = "/images", params = {"add","id"}, method = RequestMethod.GET)
+  //dans terminal : curl -X POST "http://localhost:8080/images?add=XXX&id=XXX"
+  //ajoute une image a un dossier
+  @RequestMapping(value = "/images", params = {"add","id"}, method = RequestMethod.POST)
   public ResponseEntity<?> addImageToFolder(@RequestParam("add") String folderName,@RequestParam("id") int id) {
     int idFolder = idFromName(folderName);
     Optional<Image> image = imageDao.retrieve(id);
