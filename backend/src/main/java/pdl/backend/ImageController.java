@@ -112,7 +112,7 @@ public class ImageController {
     // FIN  partie application filtre
 
     //Sauvegarde et récupération de l'image avec filtre
-    String chemin = "src/main/resources/images/"+ algo + "_" +imageDao.retrieve(id).get().getName();           
+    String chemin = "src/main/resources/images/"+ algo + "_" +imageDao.retrieve(id).get().getName();
     UtilImageIO.saveImage(imageFilter, chemin);    
     BufferedImage imageLoad =UtilImageIO.loadImageNotNull(chemin);
     ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -124,7 +124,7 @@ public class ImageController {
       Files.delete(Paths.get(chemin));
     } catch (IOException e) {
       e.printStackTrace();
-    }                                                                  
+    }
     InputStream inputStream = new ByteArrayInputStream(bos.toByteArray());
     return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(new InputStreamResource(inputStream));
   }
@@ -168,33 +168,29 @@ public class ImageController {
   public ResponseEntity<?> createFolder(@RequestParam("create") String folderName) {
 
     if(!existFolder(folderName)){
-      System.out.println("Le dossier \"" + folderName+ "\" a été créé.");
-      // ajout du nouveau dossier dans la liste !
       ImageDao Dao = new ImageDao();
       Dao.resetHashMap();
       System.out.println(Dao.retrieveAll());
       Folder dos = new Folder(Dao,folderName,1);
       listFolder[nbCurrentFolder] = dos;
       nbCurrentFolder++;
+      displayListFolder(); // print à supprimer si besoin
+      return new ResponseEntity<>("Nouveau Dossier créé ! ", HttpStatus.OK);
     }
-    else System.out.println("Le dossier \"" + folderName+ "\" existe déja.");
     displayListFolder(); // print à supprimer si besoin
-    return new ResponseEntity<>("Cool nouveau dossier :3 ! ", HttpStatus.OK);
+    return new ResponseEntity<>("Ce dossier existe déja! ", HttpStatus.BAD_REQUEST);
   }
 
   // dans terminal : curl -X DELETE "http://localhost:8080/images?delete=XXX"
   // supprime le dossier s'il existe
   @RequestMapping(value = "/images", params = {"delete"}, method = RequestMethod.DELETE)
   public ResponseEntity<?> deleteFolder(@RequestParam("delete") String folderName) {
-
     if(existFolder(folderName)){
-      System.out.println("Le dossier \"" + folderName+ "\" a été supprimé");
       deleteFolderFromList(folderName);
+      return new ResponseEntity<>("Dossier supprimé !", HttpStatus.OK);
     }
-    else System.out.println("Le dossier \"" + folderName+ "\" n'éxiste pas.");
-
     displayListFolder(); // print à supprimer si besoin 
-    return new ResponseEntity<>("Cool Supprimé :3 ! ", HttpStatus.OK);
+    return new ResponseEntity<>("Ce dossier n'existe pas !", HttpStatus.NOT_FOUND);
   }
 
   // trouver moyen de factoriser fct avec getImageList
@@ -203,9 +199,9 @@ public class ImageController {
   @ResponseBody
   public ArrayNode getImageListFromFolder(@RequestParam("liste") String folderName) throws IOException {
     int idFolder = idFromName(folderName);
-    //
-    List<Image> images = listFolder[idFolder].getImageDao().retrieveAll();
     ArrayNode nodes = mapper.createArrayNode();
+    if(idFolder == -1) return nodes; //Dossier inexistant
+    List<Image> images = listFolder[idFolder].getImageDao().retrieveAll();
     if(nbCurrentFolder == 0) return nodes;
     for (Image image : images) {
       ObjectNode objectNode = mapper.createObjectNode();
@@ -229,12 +225,23 @@ public class ImageController {
   @RequestMapping(value = "/images", params = {"add","id"}, method = RequestMethod.POST)
   public ResponseEntity<?> addImageToFolder(@RequestParam("add") String folderName,@RequestParam("id") int id) {
     int idFolder = idFromName(folderName);
+    if(nbCurrentFolder == 0) return new ResponseEntity<>("Ce dossier n'existe pas! ", HttpStatus.NOT_FOUND);
     Optional<Image> image = imageDao.retrieve(id);
+    if(image.isEmpty()) return new ResponseEntity<>("Cette image n'existe pas! ", HttpStatus.NOT_FOUND);
     listFolder[idFolder].addImage(image.get());
-    System.out.println("Ajout de l'image : " + image.get().getName() + " dans le dossier " + folderName);
-    return new ResponseEntity<>("Cool ajout image dans dossier :3 ! ", HttpStatus.OK);
+    return new ResponseEntity<>("L'image a été ajoutée dans dossier :3 ! ", HttpStatus.OK);
   }
 
+  //Renvoie la liste des albums créés
+  @RequestMapping(value = "/album", method = RequestMethod.GET, produces = "application/json")
+  @ResponseBody
+  public String[] getFolder() throws IOException {
+    String[] listName = new String[nbCurrentFolder];
+    for (int i = 0; i < nbCurrentFolder; i++) {
+      listName[i] = listFolder[i].getName();
+    }
+    return listName;
+  }
 
   ///////////////
   ///////////////
@@ -286,7 +293,7 @@ public class ImageController {
     for (Image image : images) {
       ObjectNode objectNode = mapper.createObjectNode();
       objectNode.put("id", image.getId());//récupération de l'id de l'image
-      objectNode.put("name", image.getName());//récupération du nom 
+      objectNode.put("name", image.getName());//récupération du nom
       String fe = getExtension(image.getName());//récupération de l'extension
       objectNode.put("type",fe);
       BufferedImage input = null;
@@ -295,6 +302,7 @@ public class ImageController {
 
       Planar<GrayU8> imagePlanar = ConvertBufferedImage.convertFromPlanar(input, null, true, GrayU8.class);
       objectNode.put("size",imagePlanar.getWidth()+"x"+imagePlanar.getHeight()+"x"+imagePlanar.getNumBands());//récupération de la taille
+      objectNode.put("data",image.getData().length+" o");
       nodes.add(objectNode);
     }
     return nodes;
