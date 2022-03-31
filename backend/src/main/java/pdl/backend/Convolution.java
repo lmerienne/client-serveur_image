@@ -48,18 +48,20 @@ public static void negatif(GrayU8 input, GrayU8 output){
 }
 public static void mirorHor(GrayU8 input, GrayU8 output){
   for (int x=0,j=input.width-1; x<input.getWidth(); x++, j--){
-    for (int y = 0,k=input.height-1; y < input.height; y++,k--) {
+    for (int y = 0,k=input.height-1; y < input.height/2; y++,k--) {
       int r=input.get(x, y);
+      int q=input.get(j,k);
       output.set(j, k, r);
+      output.set(x,y,q);
     }
   }
 }
 public static void mirorVer(GrayU8 input, GrayU8 output){
-  for (int x=0,j=input.width-1; x<input.getWidth(); x++, j--){
-    for (int y = 0,k=input.height-1; y < input.height; y++,k--){
+  for (int x=0,j=input.width-1; x<input.getWidth()/2; x++, j--){
+    for (int y = 0; y < input.height; y++){
       int r=input.get(x, y);
-      //int m= input.get(j, y);
-      //output.set(j, y, r);
+      int m= input.get(j, y);
+      output.set(x, y, m);
       output.set(j, y, r);
     }
   }

@@ -105,7 +105,17 @@ public class ImageController {
       if (p2<-255 ||p2>255) return new ResponseEntity<>("Algo not found.", HttpStatus.BAD_REQUEST); //verification du delta entre -255 et 255
       Color.color(imageFilter,imageFilter,p1-1,p2);
     }
+    else if(algo.equals("negatif")){
+      Color.negatif(imageFilter, imageFilter);
+    }
 
+    else if(algo.equals("mirorHor")){
+      Color.mirorHor(imageFilter,imageFilter);
+    }
+
+    else if(algo.equals("mirorVer")){
+      Color.mirorVer(imageFilter, imageFilter);
+    }
     else{
       return new ResponseEntity<>("Algo not found.", HttpStatus.BAD_REQUEST);
     }
