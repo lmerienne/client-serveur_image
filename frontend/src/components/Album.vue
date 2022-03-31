@@ -15,7 +15,7 @@ api.getListFolder()
 </script>
 <template>
     <div v-for="folder in folderList">
-        <img src="frontend/src/assets/folder.png">
+        <img src="">
         <div>
             <span>{{folder}}</span>
         </div>
