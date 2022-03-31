@@ -37,6 +37,12 @@ const routes: Array<RouteRecordRaw> = [
     name: "filter",
     component: () => import("./components/Filter.vue"),
     props: ({params}) => ({id: Number(params.id), algorithm: String(params.algorithm), p1: Number(params.p1)})
+  },
+  {
+    path: "/album",
+    name: "album",
+    component: () => import("./components/Album.vue"),
+    props: ({params}) => ({id: Number(params.id)})
   }
 
 ];
