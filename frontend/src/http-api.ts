@@ -22,5 +22,6 @@ export const api = {
   deleteImage: (id: number): Promise<void> => requests.delete(`images/${id}`), 
   withoutParameter: (algo: string, id: number): Promise<Blob> => requests.get(`images/${id}?algorithm=${algo}`, {responseType: "blob"}),
   withOneParameter: (algo: string, p1: number, id: number): Promise<Blob> => requests.get(`images/${id}?algorithm=${algo}&p1=${p1}`, {responseType: "blob"}),
-  withTwoParameter: (algo: string, p1: number, p2: number, id: number): Promise<Blob> => requests.get(`images/${id}?algorithm=${algo}&p1=${p1}&p2=${p2}`, {responseType: "blob"})
+  withTwoParameter: (algo: string, p1: number, p2: number, id: number): Promise<Blob> => requests.get(`images/${id}?algorithm=${algo}&p1=${p1}&p2=${p2}`, {responseType: "blob"}),
+  getListFolder: (): Promise<string[]> => requests.get('album',{})
 };
