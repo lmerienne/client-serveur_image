@@ -1,30 +1,11 @@
 Token : _J2NruQgU2tCLjojdGkD
 
-cmd : mvn --projects backend spring-boot:run
+mvn --projects backend spring-boot:run
+
+npm run dev
 
 export PATH=/opt/users/Node.js/bin:$PATH
 
-besoin 1    ok      FAIRE TEST
-besoin 2    cas suppression 
-besoin 3    ok
-besoin 4    info size  + test
-besoin 5    Gestion d'erreurs
-besoin 6    Gestion d'erreurs
-besoin 7    Gestion d'erreurs
-besoin 8    Gestion d'erreurs
-besoin 9    ok
-besoin 10   ok
-besoin 11   à faire
-besoin 12   ok
-besoin 13   à faire
-besoin 14   ok
-besoin 15   filtre ne fonctionne pas 
-besoin 16   pas fou 
-besoin 17   ok
-besoin 18   pas fou
-besoin 19   ok      ECRIRE dans readme
-besoin 20   ok
-besoin 21   ok
 
 
 
