@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.StackWalker.Option;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
@@ -18,6 +19,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import org.apache.catalina.valves.rewrite.QuotedStringTokenizer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -35,6 +38,7 @@ import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.image.UtilImageIO;
 import boofcv.struct.border.BorderType;
 import boofcv.struct.image.GrayU8;
+import boofcv.struct.image.ImageAccessException;
 import boofcv.struct.image.Planar;
 import java.awt.image.BufferedImage;
 
@@ -49,9 +53,21 @@ public class ImageController {
   public Folder[] listFolder = new Folder[10];
   public int nbCurrentFolder = 0;
 
+  public Folder filterFolder;
+  public Image[] tabImage= new Image[2];
+  public int pointeur=0;
+
   @Autowired
   public ImageController(ImageDao imageDao) {
     this.imageDao = imageDao;
+    /*
+    ImageDao Dao = new ImageDao();
+    Dao.resetHashMap();
+    filterFolder = new Folder(Dao, "filterFolder");
+    */
+    filterFolder = new Folder(imageDao, "filterFolder");
+
+
   }
 
 //////////////////////////////////////////////////////////////////////////
@@ -67,16 +83,59 @@ public class ImageController {
 
   public ResponseEntity<?> applyFilter(String algo,int p1,int p2, long id) throws IOException {
     System.out.println("algo : " + algo + " sur image = "+imageDao.retrieve(id).get().getName());
-    Optional<Image> image = imageDao.retrieve(id); 
+    Image image = imageDao.retrieve(id).get();
+    Optional<Image> imageOpt=imageDao.retrieve(id); 
     BufferedImage input = null;
 
-    //Convertion de type
-    if (image.isPresent()) {
-      InputStream inputStream = new ByteArrayInputStream(image.get().getData());
-      input = ImageIO.read(inputStream);
-    }else{
-      return new ResponseEntity<>("Image id=" + id + " not found.", HttpStatus.NOT_FOUND);
+
+    ///!!
+    //Si premiere image qu'on filtre
+    /*
+    if(filterFolder.getImageDao().retrieveAll().size() == 0){ 
+      filterFolder.addImage(image.get());
     }
+    //Si on change d'image pour filtre
+    else if (!filterFolder.getImageDao().retrieve(0).equals(image)) {
+      filterFolder.getImageDao().resetHashMap();
+      filterFolder.addImage(image.get());
+
+    }else{
+      long size= filterFolder.getImageDao().retrieveAll().size()-1;
+      image = filterFolder.getImageDao().retrieve(size);
+    }
+*/  if (pointeur==tabImage.length-1){
+      Image tmp=tabImage[pointeur];
+      for (int i=0; i<tabImage.length; i++){
+        tabImage[i]=null;
+      }
+      tabImage[0]=tmp;
+      pointeur=0;
+
+}
+    if (tabImage[0]==null){
+      tabImage[0]=image;
+      pointeur=0;
+    }
+    else if (!(tabImage[0].equals(image))&&!(tabImage[0].getName().equals(image.getName()))){
+      for (int i=0; i<tabImage.length; i++){
+        tabImage[i]=null;
+      }
+      tabImage[0]=image;
+      pointeur=0;
+    }
+    else{
+      image=tabImage[pointeur];
+    }
+    // pbm image vide !
+    
+
+    ////
+  //Convertion de type
+  if (imageOpt.isPresent()) { //|| filterFolder.getImageDao().retrieveAll().size()!=0) {
+    InputStream inputStream = new ByteArrayInputStream(image.getData());
+    input = ImageIO.read(inputStream);
+  }else 
+    return new ResponseEntity<>("Image id=" + id + " not found.", HttpStatus.NOT_FOUND);
 
     //appel fonctions filtre
     Planar<GrayU8> imageFilter = ConvertBufferedImage.convertFromPlanar(input, null, true, GrayU8.class);
@@ -124,8 +183,11 @@ public class ImageController {
     //Sauvegarde et récupération de l'image avec filtre
     String chemin = "src/main/resources/images/"+ algo + "_" +imageDao.retrieve(id).get().getName();
     UtilImageIO.saveImage(imageFilter, chemin);    
-    BufferedImage imageLoad =UtilImageIO.loadImageNotNull(chemin);
+    BufferedImage imageLoad = UtilImageIO.loadImageNotNull(chemin);
     ByteArrayOutputStream bos = new ByteArrayOutputStream();
+
+
+ 
 
     String fe = getExtension(chemin);
     try {
@@ -135,7 +197,14 @@ public class ImageController {
     } catch (IOException e) {
       e.printStackTrace();
     }
+
     InputStream inputStream = new ByteArrayInputStream(bos.toByteArray());
+    Image test = new Image(image.getName(), bos.toByteArray());
+    pointeur++;
+    tabImage[pointeur]=test;
+    //filterFolder.addImage(test);
+    //displayFilterFolder();
+
     return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(new InputStreamResource(inputStream));
   }
 
@@ -167,10 +236,7 @@ public class ImageController {
     return applyFilter(algo, p1, p2, id);
   }
   
-  /////////////////
-  ////////////////
   //trouver moyen de factoriser fct getImageList et getImageListFromFolder
-  //faire cas erreur : ex : dossier existe pas
 
   // dans terminal : curl -X POST "http://localhost:8080/images?create=XXX"
   //crée le dossier si il n'existe pas 
@@ -181,7 +247,7 @@ public class ImageController {
       ImageDao Dao = new ImageDao();
       Dao.resetHashMap();
       System.out.println(Dao.retrieveAll());
-      Folder dos = new Folder(Dao,folderName,1);
+      Folder dos = new Folder(Dao,folderName);
       listFolder[nbCurrentFolder] = dos;
       nbCurrentFolder++;
       displayListFolder(); // print à supprimer si besoin
@@ -371,6 +437,14 @@ public class ImageController {
     return false;
   }
 
- 
- 
+  public void displayFilterFolder(){
+    System.out.println("Les images save pour filtre sont :");
+    for (int i = 0; i < filterFolder.getImageDao().retrieveAll().size(); i++) {
+      System.out.println("nom = "+filterFolder.getImageDao().retrieve(i).get().getName()+" data = "+filterFolder.getImageDao().retrieve(i).get().getData().length);
+    }
+    System.out.println("liste ok");
+   
+  }
+
+
 }

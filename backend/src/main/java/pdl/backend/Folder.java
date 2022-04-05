@@ -40,22 +40,17 @@ import java.awt.image.BufferedImage;
 public class Folder {
   private final ImageDao imageDao;
   private final String name;
-  private final int id;
+  
 
 
   @Autowired
-  public Folder(ImageDao imageDao, String name, int id) {
+  public Folder(ImageDao imageDao, String name) {
     this.imageDao = imageDao;
     this.name = name;
-    this.id = id;
   }
 
   public String getName(){
     return this.name;
-  }
-
-  public int getId(){
-    return this.id;
   }
 
   public ImageDao getImageDao(){
