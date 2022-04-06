@@ -54,7 +54,7 @@ public class ImageController {
   public int nbCurrentFolder = 0;
 
   public Folder filterFolder;
-  public Image[] tabImage= new Image[2];
+  public Image[] tabImage= new Image[20];
   public int pointeur=0;
 
   @Autowired
@@ -238,6 +238,25 @@ public class ImageController {
   
   //trouver moyen de factoriser fct getImageList et getImageListFromFolder
 
+  //Fonctions pour le undo et redo 
+
+  @RequestMapping(value = "/images/filter/{request}", method = RequestMethod.GET, produces = MediaType.IMAGE_JPEG_VALUE)
+  public ResponseEntity<?> undoRedo(@PathVariable String request)  {
+    if (request.equals("undo")){
+      pointeur-=1;
+      InputStream inputStream = new ByteArrayInputStream(tabImage[pointeur].getData());
+      return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(new InputStreamResource(inputStream));
+    }
+    else{
+      if (pointeur==tabImage.length-1){
+        return new ResponseEntity<>("Action impossible! ", HttpStatus.BAD_REQUEST);
+      }
+      pointeur+=1;
+      InputStream inputStream = new ByteArrayInputStream(tabImage[pointeur].getData());
+      return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(new InputStreamResource(inputStream));
+    }
+    
+  }
   // dans terminal : curl -X POST "http://localhost:8080/images?create=XXX"
   //crée le dossier si il n'existe pas 
   @RequestMapping(value = "/images", params = {"create"}, method = RequestMethod.POST)
