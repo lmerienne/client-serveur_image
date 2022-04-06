@@ -189,6 +189,9 @@ function applyColor(){
           <option id="f3">color</option>
           <option id="f4">histogramme</option>
           <option id="f5">contour</option>
+          <option id="f6">negatif</option>
+          <option id="f7">mirorHor</option>
+          <option id="f8">mirorVer</option>
       </select>
       <select v-if="selectedAlgo == 'flou' " v-model="selectedOptionFlou">
         <option id="p1"> Moyenneur</option>
