@@ -124,6 +124,12 @@ public class ImageController {
       pointeur=0;
     }
     else{
+      if(tabImage[pointeur+1]!=null){
+      for (int i= pointeur+1; i<tabImage.length;i++){
+        if (tabImage[i]!=null)
+        tabImage[i]=null;
+      }
+    }
       image=tabImage[pointeur];
     }
     // pbm image vide !
