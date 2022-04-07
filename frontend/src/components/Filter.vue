@@ -57,6 +57,34 @@ function showImage2() {
     console.log(e.message);
   });
 }
+function undo(request: string){
+ api.undoredo(request)
+ .then((data: Blob) => {
+ const reader = new window.FileReader();
+ console.log("no param")
+ const url = window.URL.createObjectURL(data);
+ link = document.createElement('a')
+ link.href = url
+ link.download = "file.png"
+ document.body.appendChild(link)
+ reader.readAsDataURL(data);
+ reader.onload = () => {
+ 
+ const galleryElt = document.getElementById("gallery");
+ if (galleryElt !== null) {
+ const imgElt = document.createElement("img");
+ if(galleryElt.hasChildNodes()){
+ galleryElt.replaceChildren(imgElt);
+ }else{
+ galleryElt.appendChild(imgElt);
+ }
+ if (imgElt !== null && reader.result as string) {
+ imgElt.setAttribute("src", (reader.result as string));
+ }
+ }
+ };
+ });
+ }
 //////////////////////////////////////////////////////////////////////////
 
 
@@ -220,7 +248,12 @@ function applyColor(){
   <div>
     <button @click="downloadImage">Download</button>
   </div>
+   <div>
+ <button @click="undo('undo')">Undo</button>
+ <button @click="undo('redo')">Redo</button>
+ </div>
 </template>
+
 
 <style scoped>
 img{
