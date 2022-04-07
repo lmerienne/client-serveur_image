@@ -63,11 +63,12 @@ function displayDiv( id: string) {
 
     <h3>Selectionner une image</h3>
     <!-- arrondi de selection -->
-    <div id="liste" >
+      
       <select v-model="selectedId" @change="showImage" class="liste" value="toto">
+        <option value=""> test</option> 
         <option v-for="image in imageList" :value="image.id" :key="image.id">{{ image.name }}</option>
       </select>
-    </div>
+    
 
     <!-- trait séparation -->
     <hr/>
@@ -91,25 +92,15 @@ function displayDiv( id: string) {
 
 <style >
 
-/* bouton selection image */
-.select {
-  width: 600px; 
-  border: 2px solid #2c3e50; 
-  text-align: center; 
-  border-radius: 100px;
-  font-size: 16px;
-}
-
-
 .liste {
-   
+    width: 400px; 
+    height: 50px;
     padding: 16px;
     font-size: 16px;
-    
     border: 2px solid #2c3e50;
     border-radius: 100px;
     font-size: 16px;
-    
+    background-color: #fff;
 }
 
 .bloc {
