@@ -93,7 +93,7 @@ function deleteImage(){
 <style scoped>
   img{
     max-width: 400%;                                               /* Redimensionne l'image affichée en fonction de la taille de la page. */
-    max-height: 5%;
+    max-height: 200%;
   }
   .image {
     padding: 8px;

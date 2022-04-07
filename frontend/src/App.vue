@@ -25,9 +25,6 @@
           <router-link to="/gallery">Gallery</router-link>
         </li>
         <li>
-          <router-link to="/upload">Upload</router-link>
-        </li>
-        <li>
           <router-link to="/filter">Filter</router-link>
         </li>
         <li>
@@ -36,6 +33,7 @@
       </ul>
     </nav>
   </div>
+  
 </template>
 
 <style>
