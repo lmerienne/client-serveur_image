@@ -249,6 +249,7 @@ public class ImageController {
   @RequestMapping(value = "/images/filter/{request}", method = RequestMethod.GET, produces = MediaType.IMAGE_JPEG_VALUE)
   public ResponseEntity<?> undoRedo(@PathVariable String request)  {
     if (request.equals("undo")){
+      if (pointeur==0) return new ResponseEntity<>("Action impossible! ", HttpStatus.BAD_REQUEST);
       pointeur-=1;
       InputStream inputStream = new ByteArrayInputStream(tabImage[pointeur].getData());
       return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(new InputStreamResource(inputStream));
