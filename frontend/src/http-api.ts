@@ -23,5 +23,8 @@ export const api = {
   withoutParameter: (algo: string, id: number): Promise<Blob> => requests.get(`images/${id}?algorithm=${algo}`, {responseType: "blob"}),
   withOneParameter: (algo: string, p1: number, id: number): Promise<Blob> => requests.get(`images/${id}?algorithm=${algo}&p1=${p1}`, {responseType: "blob"}),
   withTwoParameter: (algo: string, p1: number, p2: number, id: number): Promise<Blob> => requests.get(`images/${id}?algorithm=${algo}&p1=${p1}&p2=${p2}`, {responseType: "blob"}),
-  getListFolder: (): Promise<string[]> => requests.get('album',{})
+  getListFolder: (): Promise<string[]> => requests.get('album',{}),
+  getImageListFromFolder: (foldername: string): Promise<ImageType[]> => requests.get(`images?liste=${foldername}`, {}),
+  createFolder: (foldername: string): Promise<void> => axios.post(`images?create=${foldername}`, {}).then(responseBody),
+  addImageToFolder: (foldername: string, id: number): Promise<void> => axios.post(`images?add=${foldername}&id=${id}`, {}).then(responseBody)
 };

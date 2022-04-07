@@ -90,7 +90,7 @@ function deleteImage(){
   </div>
 </template>
 
-<style>
+<style scoped>
   img{
     max-width: 400%;                                               /* Redimensionne l'image affichée en fonction de la taille de la page. */
     max-height: 5%;
