@@ -12,7 +12,7 @@ const routes: Array<RouteRecordRaw> = [
     path: "/gallery",
     name: "gallery",
     component: () => import("./components/Gallery.vue"),
-    props: true
+    props: ({params}) => ({name: String(params.ski) || null})
   },
   {
     path: "/image/:id",
@@ -42,7 +42,7 @@ const routes: Array<RouteRecordRaw> = [
     path: "/album",
     name: "album",
     component: () => import("./components/Album.vue"),
-    props: ({params}) => ({id: Number(params.id)})
+    props: true
   }
 
 ];
