@@ -15,6 +15,14 @@ var link: HTMLAnchorElement;
 
 getImageList();
 
+const props = defineProps<{ id:number}>()
+
+if(props.id){
+  selectedId.value = props.id
+  showImage2()
+}
+
+
 function getImageList() {
   api.getImageList().then((data) => {
     imageList.value = data;
