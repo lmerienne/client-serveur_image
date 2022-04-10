@@ -15,6 +15,12 @@ const routes: Array<RouteRecordRaw> = [
     props: ({params}) => ({name: String(params.ski) || null})
   },
   {
+    path: "/slide",
+    name: "slide",
+    component: () => import("./components/Slide.vue"),
+    props: true
+  },
+  {
     path: "/image/:id",
     name: "image",
     component: () => import("./components/Image.vue"),
@@ -42,6 +48,12 @@ const routes: Array<RouteRecordRaw> = [
     path: "/album",
     name: "album",
     component: () => import("./components/Album.vue"),
+    props: true
+  },
+  {
+    path: "/data",
+    name: "data",
+    component: () => import("./components/Data.vue"),
     props: true
   }
 
