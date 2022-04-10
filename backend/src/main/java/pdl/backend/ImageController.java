@@ -47,21 +47,14 @@ public class ImageController {
   public Folder[] listFolder = new Folder[10];
   public int nbCurrentFolder = 0;
 
-  public Folder filterFolder;
   public Image[] tabImage= new Image[20];
   public int pointeur=0;
+
+  public int nbImageUpload = 0;
 
   @Autowired
   public ImageController(ImageDao imageDao) {
     this.imageDao = imageDao;
-    /*
-    ImageDao Dao = new ImageDao();
-    Dao.resetHashMap();
-    filterFolder = new Folder(Dao, "filterFolder");
-    */
-    filterFolder = new Folder(imageDao, "filterFolder");
-
-
   }
 
 //////////////////////////////////////////////////////////////////////////
@@ -81,31 +74,14 @@ public class ImageController {
     Optional<Image> imageOpt=imageDao.retrieve(id); 
     BufferedImage input = null;
 
-
-    ///!!
-    //Si premiere image qu'on filtre
-    /*
-    if(filterFolder.getImageDao().retrieveAll().size() == 0){ 
-      filterFolder.addImage(image.get());
-    }
-    //Si on change d'image pour filtre
-    else if (!filterFolder.getImageDao().retrieve(0).equals(image)) {
-      filterFolder.getImageDao().resetHashMap();
-      filterFolder.addImage(image.get());
-
-    }else{
-      long size= filterFolder.getImageDao().retrieveAll().size()-1;
-      image = filterFolder.getImageDao().retrieve(size);
-    }
-*/  if (pointeur==tabImage.length-1){
+    if (pointeur==tabImage.length-1){
       Image tmp=tabImage[pointeur];
       for (int i=0; i<tabImage.length; i++){
         tabImage[i]=null;
       }
       tabImage[0]=tmp;
       pointeur=0;
-
-}
+    }
     if (tabImage[0]==null){
       tabImage[0]=image;
       pointeur=0;
@@ -126,10 +102,7 @@ public class ImageController {
     }
       image=tabImage[pointeur];
     }
-    // pbm image vide !
     
-
-    ////
   //Convertion de type
   if (imageOpt.isPresent()) { //|| filterFolder.getImageDao().retrieveAll().size()!=0) {
     InputStream inputStream = new ByteArrayInputStream(image.getData());
@@ -346,8 +319,23 @@ public class ImageController {
     return listName;
   }
 
-  ///////////////
-  ///////////////
+  //Renvoie l'espace mémoire occupé par les images en Ko
+  @RequestMapping(value = "/data", method = RequestMethod.GET, produces = "application/json")
+  @ResponseBody
+  public int getData(){
+    List<Image> images = imageDao.retrieveAll();
+    double count = 0;
+    for (Image image : images) { count += image.getData().length; }
+    return (int) count / 1000;
+  }
+
+  //Renvoie le nombre d'image upload
+  @RequestMapping(value = "/upload", method = RequestMethod.GET, produces = "application/json")
+  @ResponseBody
+  public int getNbImageUpload(){
+    return nbImageUpload;
+  }
+
   @RequestMapping(value = "/images/{id}", method = RequestMethod.GET, produces = MediaType.IMAGE_JPEG_VALUE)
   public ResponseEntity<?> getImage(@PathVariable("id") long id) {
 
@@ -367,6 +355,7 @@ public class ImageController {
 
     if (image.isPresent()) {
       imageDao.delete(image.get());
+      nbImageUpload--;
       return new ResponseEntity<>("Image id=" + id + " deleted.", HttpStatus.OK);
     }
     return new ResponseEntity<>("Image id=" + id + " not found.", HttpStatus.NOT_FOUND);
@@ -385,8 +374,10 @@ public class ImageController {
     } catch (IOException e) {
       return new ResponseEntity<>("Failure to read file", HttpStatus.NO_CONTENT);
     }
+    nbImageUpload++;
     return new ResponseEntity<>("Image uploaded", HttpStatus.OK);
   }
+
 //requete json:
   @RequestMapping(value = "/images", method = RequestMethod.GET, produces = "application/json")
   @ResponseBody
@@ -463,15 +454,4 @@ public class ImageController {
     }
     return false;
   }
-
-  public void displayFilterFolder(){
-    System.out.println("Les images save pour filtre sont :");
-    for (int i = 0; i < filterFolder.getImageDao().retrieveAll().size(); i++) {
-      System.out.println("nom = "+filterFolder.getImageDao().retrieve(i).get().getName()+" data = "+filterFolder.getImageDao().retrieve(i).get().getData().length);
-    }
-    System.out.println("liste ok");
-   
-  }
-
-
 }
