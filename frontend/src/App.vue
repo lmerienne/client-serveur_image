@@ -22,13 +22,16 @@
           <router-link to="/">Home</router-link>
         </li>
         <li>
-          <router-link to="/gallery">Gallery</router-link>
+          <router-link to="/slide">Gallery</router-link>
         </li>
         <li>
           <router-link to="/filter">Filter</router-link>
         </li>
         <li>
           <router-link to="/album">Albums</router-link>
+        </li>
+        <li>
+          <router-link to="/data">Data</router-link>
         </li>
       </ul>
     </nav>

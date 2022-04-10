@@ -65,7 +65,6 @@ function displayDiv( id: string) {
     <!-- arrondi de selection -->
       
       <select v-model="selectedId" @change="showImage" class="liste" value="toto">
-        <option value=""> test</option> 
         <option v-for="image in imageList" :value="image.id" :key="image.id">{{ image.name }}</option>
       </select>
     

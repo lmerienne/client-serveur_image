@@ -4,6 +4,7 @@ import { api } from '@/http-api';
 import { ImageType } from '@/image'
 import Image from './ImageG.vue';
 import Popup from './Popup.vue';
+import router from '@/router';
 
 const props = defineProps<{ name:string }>()
 const imageList = ref<ImageType[]>([]);
@@ -58,6 +59,11 @@ function TogglePopup() {
 function uploadImage() {
   api.addImageToFolder(props.name, idImageToFolder.value);
 }
+
+function toSlide(){
+  router.push({name:'slide'})  
+}
+
 </script>
 
 <template>
@@ -80,6 +86,10 @@ function uploadImage() {
         <br>
         <button class="closePopup" @click="TogglePopup()">Annuler</button>
   </Popup>
+
+  <div class="toSlide">
+    <img class="bouton" @click="toSlide" src="../assets/galleryToSlide.png" id="b">
+  </div>
 </template>
 
 <style scoped>
@@ -123,10 +133,28 @@ function uploadImage() {
     .gallerySKU {
       float: left;
       position: relative;
-      max-width: 70%;
       max-height: 70%;
+      max-width: 70%;
       left: 10%;
       right: 90%;
     } 
-    
+    .ImageG{
+      max-height: 100ex;
+      max-width: 100ex;
+    }
+
+    #b{
+      width: 70px;
+      height: 70px;
+      opacity: 0.4;
+      transition: all 0.3s ease;
+    }
+
+    #b:hover{
+      transform: scale(1.1);
+      opacity:1;
+    }
+
+
+
 </style>
