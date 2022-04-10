@@ -27,5 +27,6 @@ export const api = {
   getImageListFromFolder: (foldername: string): Promise<ImageType[]> => requests.get(`images?liste=${foldername}`, {}),
   createFolder: (foldername: string): Promise<void> => axios.post(`images?create=${foldername}`, {}).then(responseBody),
   addImageToFolder: (foldername: string, id: number): Promise<void> => axios.post(`images?add=${foldername}&id=${id}`, {}).then(responseBody),
-  undoredo: (request: string): Promise<Blob> => requests.get(`images/filter/${request}`,{responseType:"blob"}) 
+  undoredo: (request: string): Promise<Blob> => requests.get(`images/filter/${request}`,{responseType:"blob"}),
+  reset: (): Promise<void> => axios.post("images/reset").then(responseBody) 
 };

@@ -216,6 +216,8 @@ function applyColor(){
 }
 
 function reloadSKU() {
+  console.log("skuuu");
+  api.reset().then;
   location.reload();
 }
 
@@ -285,8 +287,8 @@ function reloadSKU() {
 </div>
 
 <div class="arrows">
-  <div class="undoArrow left"></div>
-  <div class="undoArrow"></div>
+  <div @click="undo('undo')" class="undoArrow left"></div>
+  <div @click="undo('redo')" class="undoArrow"></div>
 </div>
 
 
