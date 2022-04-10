@@ -382,5 +382,153 @@ Les actions que peut effectuer l'utilisateur côté client induisent des requêt
 {}
 {}
 
+\section{\label{sec:kernel}Extension}
+
+\subsection{Serveur}
+
+\besoin{bnf:album}
+{Gestion d'album}
+{
+  Ajout de la gestion d'albums.
+  L'utilisateur peut :
+  \begin{itemize}
+  \item Créer et attribuer un nom à un album
+  \item Ajouter une image disponible à un album
+  \item Afficher les images presentent dans l'album dans un galerie
+  \item Supprimer un album
+  \end{itemize}
+}
+{}
+{}
+
+\besoin{bnf:filtre}
+{Superposition des filtres}
+{
+  Il est possible d'ajouter un filtre sur une image sur laquelle on a auparavant déjà appliqué un ou plusieurs autres filtres.
+  
+}
+{}
+{}
+
+\besoin{bnf:undoredo}
+{Application de filtre : Undo / Redo}
+{
+  Lors de la modification d'une image avec un ou plusieurs filtres le serveur doit stocker chaque opérations effectuées.
+}
+{}
+{}
+
+\subsection{Communication}
+
+
+\besoin{bnf:listedossier}
+{ Transférer la liste des images disponibles dans un album}
+{
+  La liste des images présentes dans un dossier doit être envoyée par le serveur
+lorsqu’il reçoit une requête GET à l’adresse /images?liste=X.
+Cette liste doit etre de la même forme que pour le 
+  \refBesoin{bnf:clientCompatibility}.
+
+  
+}
+{}
+{}
+
+\besoin{bnf:gestiondossier}
+{ Gestion des albums}
+{
+  Les requetes possible pour gérer les albums sont :
+  \begin{itemize}
+  \item Créer un album : /images?create=NomAlbum;
+  \item Supprimer un album : /images?delete=NomAlbum;
+  \item Renvoyer les images disponibles dans un album : /images?liste=NomAlbum;
+  \item Ajouter une image à un album : /images?add=NomAlbum\&id=IdImage.
+  \end{itemize}
+}
+{}
+{}
+
+\besoin{bnf:undoredo}
+{ Exécutions des fonctions undo et redo par le serveur}
+{
+  
+  L'envoi d'une requête GET de la forme images/filter/{request} doit renvoyer en fonction de la demande undo ou redo l'image précédement modifiées ou celle d'après si les conditions suivantes sont respéctées:
+  \begin{itemize}
+  \item Ne pas pouvoir faire un undo sur la première image si elle n'est pas modifiée;
+  \item Ne pas pouvoir faire un redo sur la dernière image modifiée;
+  \item Supprimer toutes les modifications qui sont après la requête undo, lorsqu'on a une suite de requête undo suivi de modification.
+  \end{itemize}
+
+}
+{}
+{}
+\subsection{Client}
+\label{cli} 
+\besoin{cli:Parcours albums} 
+{Parcourir les dossiers disponibles sur le serveur}
+{
+  L'utilisateur peut visualiser les albums disponibles sur le serveur. La présentation visuelle prendra la forme de plusieurs icônes alignés.
+}
+{}
+{}
+
+\besoin{cli:Parcours images albums} 
+{Parcours des images dans un album}
+{
+L'utilisateur peut visualiser seulement les images présentent dans l'album sélectionné. La présentation prendra la forme d'une galerie d'images.
+}
+{}
+{}
+
+\besoin{cli:Ajout album} 
+{Ajout d'un nouvel album sur le serveur}
+{
+L'utilisateur peut ajouter un nouvel album à l'aide d'un bouton.
+}
+{}
+{}
+
+\besoin{cli:Ajout image album} 
+{Ajout d'une nouvelle dans un album sur le serveur}
+{
+L'utilisateur peut ajouter une nouvelle image dans un album à l'aide d'un bouton.
+}
+{}
+{}
+
+\besoin{cli:modification image} 
+{Bouton undo et redo}
+{
+  L'utilisateur peut à l'aide de boutons revenir sur les modications portées à une image.
+}
+{}
+{}
+\subsection{Traitement d'images}
+\label{tai}
+\besoin{tai:négativité}
+{Négativité}
+{
+  L'utilisateur peut appliquer un effet de négatif sur l'image séléctionnée.  
+  
+}
+{}
+{}
+
+\besoin{tai:horizontale}
+{Miroir Horizontale}
+{
+  L'utilisateur peut appliquer un effet miroir sur la partie horizontale de l'image séléctionnée.  
+}
+{}
+{}
+
+\besoin{tai:verticale}
+{Miroir verticale}
+{
+  L'utilisateur peut appliquer un effet miroir sur la partie verticale de l'image séléctionnée.
+  
+}
+{}
+{}
 
 \end{document}
