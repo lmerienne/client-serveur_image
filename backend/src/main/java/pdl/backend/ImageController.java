@@ -258,7 +258,7 @@ public class ImageController {
     }
     
   }
-  @RequestMapping(value = "/images/filter/reset", method = RequestMethod.POST)
+  @RequestMapping(value = "/images/reset", method = RequestMethod.POST)
   public ResponseEntity<?> reset(@PathVariable String request)  {
     for (int i=0; i<tabImage.length; i++){
       tabImage[i]=null;
