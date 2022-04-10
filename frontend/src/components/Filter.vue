@@ -23,10 +23,11 @@ getImageList();
 
 const props = defineProps<{ id:number}>()
 
+
+
 if(props.id != undefined){
   boolSkuShowImage.value = false ;
-  console.log(props.id);
-  api.getImage(props.id)
+  api.getImage(props.id-1)
   .then((data: Blob) => {
     const reader = new window.FileReader();
     reader.readAsDataURL(data);                                                     // Création d'un URL cliquable menant vers l'image affichée pour la télécharger.

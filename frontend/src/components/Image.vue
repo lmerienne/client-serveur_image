@@ -25,8 +25,9 @@ function getImageList() {
 
 api.getImage(props.id)
   .then((data: Blob) => {
-    const reader = new window.FileReader();   
-    idSku.value = selectedId.value;
+    const reader = new window.FileReader();
+    //idSku.value = selectedId.value;
+    idSku.value = props.id; // si id=0 ca veut pas 
     const url = window.URL.createObjectURL(data);              // Création d'un URL cliquable menant vers l'image affichée pour la télécharger.
     link = document.createElement('a')
     link.href = url
@@ -94,12 +95,17 @@ function showImage() {
 }
 
 function filter() {
-  console.log("qskjdo");
-  router.push({ name: 'filter', params: { id: idSku.value} })
+  // +1 car aime pas 0 ==> donc -1 dans filter
+  router.push({ name: 'filter', params: { id: idSku.value+1} })
 }
 
 function downloadImage(){
-  console.log(link)
+  api.addDownload()
+    .then((data) => {
+    })
+    .catch((err) => {
+        console.log(err.message);
+    });
   link.click()                                                   // Simule un clique sur le lien de l'image crée pour la télécharger.
 }
 

@@ -29,12 +29,16 @@ api.getImageList()
 showImage();
 
 function showImage() {
-  
     const id = selectedId.value;
     api.getImage(id)
   .then((data: Blob) => {
     console.log("name : " + imageList.value[selectedId.value].name)
     const reader = new window.FileReader();
+    const url = window.URL.createObjectURL(data);              // Création d'un URL cliquable menant vers l'image affichée pour la télécharger.
+    link = document.createElement('a')
+    link.href = url
+    link.download = "file.png"
+    document.body.appendChild(link)
     reader.readAsDataURL(data);                                                     // Création d'un URL cliquable menant vers l'image affichée pour la télécharger.
     reader.onload = () => {
       const galleryElt = document.getElementById("image");
@@ -71,7 +75,7 @@ function next(){
 }
 
 function filter() {
-  router.push({ name: 'filter', params: { id: selectedId.value} })
+  router.push({ name: 'filter', params: { id: selectedId.value+1} })
 }
 
 function toGallery(){
@@ -79,6 +83,12 @@ function toGallery(){
 }
 
 function downloadImage(){
+  api.addDownload()
+    .then((data) => {
+    })
+    .catch((err) => {
+        console.log(err.message);
+    });
   console.log(link)
   link.click()                                              
 }

@@ -30,5 +30,7 @@ export const api = {
   undoredo: (request: string): Promise<Blob> => requests.get(`images/filter/${request}`,{responseType:"blob"}),
   reset: (): Promise<void> => axios.post("images/reset").then(responseBody),
   getData: (): Promise<number> => requests.get('data',{}),
-  getNbImageUpload: (): Promise<number> => requests.get('upload',{})
+  getNbImageUpload: (): Promise<number> => requests.get('upload',{}),
+  addDownload: (): Promise<void> => requests.get('dl',{}),
+  getDownload: (): Promise<number> => requests.get('download',{})
 };

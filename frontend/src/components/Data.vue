@@ -10,7 +10,16 @@ const imageList = ref<ImageType[]>([]);
 const sumData = ref<number>(0)
 
 const nbImageUplaod = ref<number>(0)
+const nbImageDownload = ref<number>(0)
 
+
+api.getDownload()
+    .then((data) => {
+        nbImageDownload.value = data;
+    })
+    .catch((err) => {
+        console.log(err.message);
+    });
 
 api.getNbImageUpload()
     .then((data) => {
@@ -66,7 +75,7 @@ api.getImageList()
     <div class="secondLine">
             <div class="pos download">
                 <img class="icone" src="../assets/download.png">
-                <span > {{}} 0 images téléchargées</span> 
+                <span > {{nbImageDownload}} images téléchargées</span> 
             </div>
 
 

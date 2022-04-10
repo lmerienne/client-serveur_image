@@ -51,6 +51,7 @@ public class ImageController {
   public int pointeur=0;
 
   public int nbImageUpload = 0;
+  public int nbImageDownload = 0;
 
   @Autowired
   public ImageController(ImageDao imageDao) {
@@ -175,8 +176,6 @@ public class ImageController {
     Image test = new Image(image.getName(), bos.toByteArray());
     pointeur++;
     tabImage[pointeur]=test;
-    //filterFolder.addImage(test);
-    //displayFilterFolder();
 
     return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(new InputStreamResource(inputStream));
   }
@@ -267,6 +266,18 @@ public class ImageController {
     }
     displayListFolder(); // print à supprimer si besoin 
     return new ResponseEntity<>("Ce dossier n'existe pas !", HttpStatus.NOT_FOUND);
+  }
+
+  @RequestMapping(value = "/dl", method = RequestMethod.GET)
+  public void Download() {
+    nbImageDownload ++;
+    System.out.println("une image a été download");
+  }
+
+  @RequestMapping(value = "/download", method = RequestMethod.GET)
+  public int getDownload() {
+    System.out.println("final nb download = " + nbImageDownload);
+    return nbImageDownload ;
   }
 
   // trouver moyen de factoriser fct avec getImageList
