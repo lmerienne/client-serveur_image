@@ -18,6 +18,7 @@ function getImageList() {
 }
 
 function showImage() {
+  console.log("mmmmm");
   router.push({ name: 'image', params: { id: selectedId.value } })
 }
 
@@ -64,7 +65,7 @@ function displayDiv( id: string) {
     <h3>Selectionner une image</h3>
     <!-- arrondi de selection -->
       
-      <select v-model="selectedId" @change="showImage" class="liste" value="toto">
+      <select v-model="selectedId" @change="showImage()" class="liste" value="toto">
         <option v-for="image in imageList" :value="image.id" :key="image.id">{{ image.name }}</option>
       </select>
     

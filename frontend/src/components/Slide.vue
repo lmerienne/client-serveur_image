@@ -47,6 +47,8 @@ function showImage() {
         }
         if (imgElt !== null && reader.result as string) {
           imgElt.setAttribute("src", (reader.result as string));
+          imgElt.setAttribute("style", 
+          "max-height: 350px; max-width: auto; ");
         }
       }
     };

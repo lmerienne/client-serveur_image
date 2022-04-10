@@ -10,6 +10,7 @@ const selectedId = ref(-1);
 const imageList = ref<ImageType[]>([]);
 const target = ref<HTMLInputElement>();
 const selectedBool = ref<Boolean>(true);
+const idSku = ref<number>(0);
 getImageList();
 
 function getImageList() {
@@ -23,6 +24,43 @@ function getImageList() {
 //////////// Affiche l'image correspondante à l'id ////////////
 
 api.getImage(props.id)
+  .then((data: Blob) => {
+    const reader = new window.FileReader();   
+    idSku.value = selectedId.value;
+    const url = window.URL.createObjectURL(data);              // Création d'un URL cliquable menant vers l'image affichée pour la télécharger.
+    link = document.createElement('a')
+    link.href = url
+    link.download = "file.png"
+    document.body.appendChild(link)
+    console.log(link)
+    reader.readAsDataURL(data);
+    reader.onload = () => {
+      const galleryElt = document.getElementById("gallery");
+      if (galleryElt !== null) {
+        const imgElt = document.createElement("img");
+        if(galleryElt.hasChildNodes()){
+            galleryElt.replaceChildren(imgElt);                 // Vérifie si un childNode est déjà présent, si oui, le remplace,
+        }else{                                                  // sinon, en crée un nouveau. Permet d'éviter l'ajout de multiple fils au noeud
+            galleryElt.appendChild(imgElt);                     // et l'affichage des anciennes photos.
+        }
+        if (imgElt !== null && reader.result as string) {
+          imgElt.setAttribute("class", "imgSku");
+          imgElt.setAttribute("src", (reader.result as string));
+          imgElt.setAttribute("style", 
+          "max-height: 350px; max-width: auto; ")
+        }
+      }
+    };
+  })
+  .catch(e => {
+    console.log(e.message);
+  });
+//////////////////////////////////////////////////////////////////
+
+function showImage() {
+  console.log(selectedId.value);
+  //router.push({ name: 'image', params: { id: selectedId.value } })
+  api.getImage(selectedId.value)
   .then((data: Blob) => {
     const reader = new window.FileReader();   
     const url = window.URL.createObjectURL(data);              // Création d'un URL cliquable menant vers l'image affichée pour la télécharger.
@@ -44,6 +82,8 @@ api.getImage(props.id)
         if (imgElt !== null && reader.result as string) {
           imgElt.setAttribute("class", "imgSku");
           imgElt.setAttribute("src", (reader.result as string));
+          imgElt.setAttribute("style", 
+          "max-height: 350px; max-width: auto; ")
         }
       }
     };
@@ -51,14 +91,11 @@ api.getImage(props.id)
   .catch(e => {
     console.log(e.message);
   });
-//////////////////////////////////////////////////////////////////
-
-function showImage() {
-  router.push({ name: 'image', params: { id: selectedId.value } })
 }
 
 function filter() {
-  router.push({ name: 'filter', params: { id: props.id} })
+  console.log("qskjdo");
+  router.push({ name: 'filter', params: { id: idSku.value} })
 }
 
 function downloadImage(){
@@ -77,7 +114,7 @@ function deleteImage(){
 <h3>Selectionner une image</h3>
     <!-- arrondi de selection -->
     <div id="liste" >
-      <select v-model="selectedId" @change="showImage" class="liste" value="toto">
+      <select v-model="selectedId" @change="showImage()" class="liste" value="toto">
         <option v-for="image in imageList" :value="image.id" :key="image.id">{{ image.name }}</option>
       </select>
     </div>
@@ -94,8 +131,9 @@ function deleteImage(){
 <style scoped>
 
   img.imgSku{
-    display: block;
-    height: 50px;
+    object-fit: contain;
+    max-height: 100%;
+    width: auto;
   }
   .figure {
     position: relative;

@@ -1,4 +1,4 @@
-import { createWebHistory, createRouter } from "vue-router";
+import { createWebHashHistory, createRouter } from "vue-router";
 import { RouteRecordRaw } from "vue-router";
 
 const routes: Array<RouteRecordRaw> = [
@@ -42,7 +42,7 @@ const routes: Array<RouteRecordRaw> = [
     path: "/filter",
     name: "filter",
     component: () => import("./components/Filter.vue"),
-    props: ({params}) => ({id: Number(params.id)})
+    props: ({params}) => ({id: Number(params.id) || null})
   },
   {
     path: "/album",
@@ -60,7 +60,7 @@ const routes: Array<RouteRecordRaw> = [
 ];
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHashHistory(),
   routes,
 });
 

@@ -18,13 +18,36 @@ const valueOfGreen = ref<number>(0);
 const valueOfBlue = ref<number>(0);
 const valueOfFlou = ref<number>(0);
 
+
 getImageList();
 
 const props = defineProps<{ id:number}>()
 
-if(props.id){
-  selectedId.value = props.id
-  showImage2()
+if(props.id != undefined){
+  boolSkuShowImage.value = false ;
+  console.log(props.id);
+  api.getImage(props.id)
+  .then((data: Blob) => {
+    const reader = new window.FileReader();
+    reader.readAsDataURL(data);                                                     // Création d'un URL cliquable menant vers l'image affichée pour la télécharger.
+    reader.onload = () => {
+      const galleryElt = document.getElementById("gallery");
+      if (galleryElt !== null) {
+        const imgElt = document.createElement("img");
+        if(galleryElt.hasChildNodes()){                                             // Vérifie si un childNode est déjà présent, si oui, le remplace,
+            galleryElt.replaceChildren(imgElt);                                     // sinon, en crée un nouveau. Permet d'éviter l'ajout de multiple fils au noeud
+        }else{                                                                      // et l'affichage des anciennes photos.
+            galleryElt.appendChild(imgElt);
+        }
+        if (imgElt !== null && reader.result as string) {
+          imgElt.setAttribute("src", (reader.result as string));
+        }
+      }
+    };
+  })
+  .catch(e => {
+    console.log(e.message);
+  });
 }
 
 
@@ -129,6 +152,7 @@ function applyFilter() {
         }
         if (imgElt !== null && reader.result as string) {
           imgElt.setAttribute("src", (reader.result as string));
+          imgElt.setAttribute("style", "max-width: 400px; max-height: 400px;");
         }
       }
     };
@@ -157,6 +181,7 @@ function applyFilter() {
         }
         if (imgElt !== null && reader.result as string) {
           imgElt.setAttribute("src", (reader.result as string));
+          imgElt.setAttribute("style", "max-width: 400px; max-height: 400px;");
         }
       }
     };
@@ -185,6 +210,8 @@ function applyFilter() {
         }
         if (imgElt !== null && reader.result as string) {
           imgElt.setAttribute("src", (reader.result as string));
+          imgElt.setAttribute("style", 
+          "max-height: 350px; max-width: auto; ");
         }
       }
     };
