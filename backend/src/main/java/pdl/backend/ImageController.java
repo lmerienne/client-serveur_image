@@ -258,6 +258,13 @@ public class ImageController {
     }
     
   }
+  @RequestMapping(value = "/images/filter/reset", method = RequestMethod.POST)
+  public ResponseEntity<?> reset(@PathVariable String request)  {
+    for (int i=0; i<tabImage.length; i++){
+      tabImage[i]=null;
+    }
+    return new ResponseEntity<>("Tableau reset", HttpStatus.OK);
+  }
   // dans terminal : curl -X POST "http://localhost:8080/images?create=XXX"
   //crée le dossier si il n'existe pas 
   @RequestMapping(value = "/images", params = {"create"}, method = RequestMethod.POST)
