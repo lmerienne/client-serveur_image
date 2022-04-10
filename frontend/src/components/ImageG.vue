@@ -25,6 +25,8 @@ api.getImage(props.id)
         galleryElt.appendChild(imgElt);
         if (imgElt !== null && reader.result as string) {
           imgElt.setAttribute("src", (reader.result as string));
+          imgElt.setAttribute("style", 
+          "max-height: 350px; max-width: auto; ");
         }
       }
     };
@@ -41,8 +43,9 @@ api.getImage(props.id)
 
 <style>
   img{
-    max-width: 20%;
-    max-height: 5%;             /* Redimensionne les images en fonction de la taille de la fenêtre */
+    max-height: 75%; 
+    max-width: auto;
+                        /* Redimensionne les images en fonction de la taille de la fenêtre */
     padding-right: 5px;
   }
 </style>

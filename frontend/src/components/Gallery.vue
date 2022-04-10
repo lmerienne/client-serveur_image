@@ -138,11 +138,7 @@ function toSlide(){
       left: 10%;
       right: 90%;
     } 
-    .ImageG{
-      max-height: 100ex;
-      max-width: 100ex;
-    }
-
+    
     #b{
       width: 70px;
       height: 70px;

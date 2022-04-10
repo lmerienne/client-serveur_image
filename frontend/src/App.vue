@@ -3,12 +3,14 @@
 
 <template>
   <div id="app">
+    <header>
     <div class="c-header">
       <router-link to="/">
         <h1 class="home-button">PDL - L3</h1>
       </router-link>
       <router-view />
     </div>
+    </header>
     <input type="checkbox" class="c-btn-toggle" id="btnToggle">
     <label class="c-btn-icon" for="btnToggle">
       <div class="c-btn-bar c-btn-bar--diagonal diagonal-1"></div>
@@ -46,21 +48,22 @@
   color: #2c3e50;
   text-decoration: none;
 }
-body {
-  padding: 0;
-  margin: 0;
-  height: 100%;
-}
+
 html, body {
   overflow-x: hidden;
   height: 100%;
+  padding: 0;
+  margin: 0;
+}
+header {
+background-color: #595959;
 }
 
 .c-header {
   width: 100%;
   height: 60px;
   background-color: #595959;
-  position: fixed;
+  position: absolute;
   text-decoration: none;
 }
 
