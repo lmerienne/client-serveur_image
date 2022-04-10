@@ -42,6 +42,7 @@ api.getImage(props.id)
             galleryElt.appendChild(imgElt);                     // et l'affichage des anciennes photos.
         }
         if (imgElt !== null && reader.result as string) {
+          imgElt.setAttribute("class", "imgSku");
           imgElt.setAttribute("src", (reader.result as string));
         }
       }
@@ -80,7 +81,7 @@ function deleteImage(){
         <option v-for="image in imageList" :value="image.id" :key="image.id">{{ image.name }}</option>
       </select>
     </div>
-  <figure id="gallery"></figure> 
+  <div class="figure" id="gallery"></div> 
 
   
   <div >
@@ -91,9 +92,13 @@ function deleteImage(){
 </template>
 
 <style scoped>
-  img{
-    max-width: 400%;                                               /* Redimensionne l'image affichée en fonction de la taille de la page. */
-    max-height: 200%;
+
+  img.imgSku{
+    display: block;
+    height: 50px;
+  }
+  .figure {
+    position: relative;
   }
   .image {
     padding: 8px;

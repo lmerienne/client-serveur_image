@@ -123,11 +123,10 @@ function uploadImage() {
     .gallerySKU {
       float: left;
       position: relative;
-      max-height: 60%;
-      max-width: 20%;
+      max-width: 70%;
+      max-height: 70%;
+      left: 10%;
+      right: 90%;
     } 
-    .ImageG{
-      max-height: 100ex;
-      max-width: 100ex;
-    }
+    
 </style>
