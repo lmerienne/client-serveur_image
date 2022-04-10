@@ -87,7 +87,7 @@ function toSlide(){
         <button class="closePopup" @click="TogglePopup()">Annuler</button>
   </Popup>
 
-  <div class="toSlide">
+  <div v-if="!boolButtonAddImage" class="toSlide">
     <img class="bouton" @click="toSlide" src="../assets/galleryToSlide.png" id="b">
   </div>
 </template>
